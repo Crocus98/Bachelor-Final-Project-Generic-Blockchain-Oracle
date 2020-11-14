@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Oracle888730.Classes;
+using Flurl.Util;
 
 namespace Oracle888730.Utility
 {
@@ -38,8 +39,10 @@ namespace Oracle888730.Utility
 
         public void StartListener()
         {
-            var listener = new RequestListener(web3, config);
-            listener.Start();
+            List<Task> listeners = new List<Task>();
+            listeners.Add(new RequestListener(web3, config).Start());
+            listeners.Add(new SubscribeListener(web3, config).Start());
+            Task.WaitAll(listeners.ToArray());
         }
 
         private async Task DeployAsync(Config _config)

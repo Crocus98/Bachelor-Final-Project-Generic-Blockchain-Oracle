@@ -24,17 +24,17 @@ namespace Oracle888730.Utility
         }
 
         //Ottiene lo spot price per questi cambi
-        public async Task<string> GetWantedValue(int _wantedValue)
+        public async Task<string> GetWantedValue(string _wantedValue)
         {
 
-            string wantedValue = new CurrencyChangesEnum().EnumStringConversion(_wantedValue);
+            //string wantedValue = new CurrencyChangesEnum().EnumStringConversion(_wantedValue);
             try
             {
-                if (wantedValue == "Error")
+                if (_wantedValue == "Error")
                 {
                     throw new Exception("Wrong conversion value");
                 }
-                var spot = await coinbaseClient.Data.GetSpotPriceAsync(wantedValue);
+                var spot = await coinbaseClient.Data.GetSpotPriceAsync(_wantedValue);
                 if(spot.Errors != null)
                 {
                     throw new Exception("CoinBase not available");

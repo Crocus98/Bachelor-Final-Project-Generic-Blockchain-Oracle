@@ -8,6 +8,7 @@ using Oracle888730.Contracts.Oracle888730.ContractDefinition;
 using Oracle888730.OracleEF;
 using Oracle888730.OracleEF.Models;
 using System.Numerics;
+using Oracle888730.Enums;
 
 namespace Oracle888730.Classes
 {
@@ -23,16 +24,24 @@ namespace Oracle888730.Classes
         {
             int requestType = (int)handledEventLog.Event.RequestType;
             string address = handledEventLog.Event.Sender;
-            var value = callApiHelper.GetWantedValue(requestType);
-            value.Wait();
+            string stringForApi = new CurrencyChangesEnum().EnumStringConversion(requestType);
 
-            //Using the same instance of Web3 across services, there is a nonce manager (in memory) that will ensure that your transactions are in the right order (safe thread too)
-            var res = contractService.SendResponseRequestAndWaitForReceiptAsync(
-                    clientAddress: address,
-                    value: value.Result,
-                    requestType: requestType
-                );
-            StringWriter.Enqueue(message + " Richiesta: " + requestType + " Da: " + address + " completata!");
+            if (stringForApi == "Error")
+            {
+                StringWriter.Enqueue(message + " Failed request for inexistent service: " + requestType + " From: " + address);
+            }
+            else
+            {
+                var value = callApiHelper.GetWantedValue(stringForApi);
+                value.Wait();
+                //Using the same instance of Web3 across services, there is a nonce manager (in memory) that will ensure that your transactions are in the right order (safe thread too)
+                var res = contractService.SendResponseRequestAndWaitForReceiptAsync(
+                        clientAddress: address,
+                        value: value.Result,
+                        requestType: requestType
+                    );
+                StringWriter.Enqueue(message + " Successfull request for service: " + requestType + " From: " + address);
+            }
         }
 
         protected override void ExceptionHandler(Task _taskHandler)

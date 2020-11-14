@@ -1,4 +1,5 @@
-﻿using Nethereum.Web3;
+﻿using Nethereum.Contracts;
+using Nethereum.Web3;
 using Oracle888730.Contracts.Oracle888730;
 using Oracle888730.Utility;
 using System.Threading.Tasks;
@@ -19,12 +20,23 @@ namespace Oracle888730.Classes
             contractService = new Oracle888730Service(web3, config.Oracle.ContractAddress);
         }
 
-        public void Start()
+        public Task Start()
         {
             Task taskListener = new Task(Listener);
             taskListener.ContinueWith(ExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
             taskListener.Start();
-            taskListener.Wait();
+            return taskListener;
+        }
+
+        protected Event GetEvent(string _eventName)
+        {
+            StringWriter.Enqueue(message + " Listener setup started...");
+            var contract = web3.Eth.GetContract(
+                config.Oracle.Abi,
+                config.Oracle.ContractAddress
+            );
+            Event genericEvent = contract.GetEvent(_eventName);
+            return genericEvent;
         }
 
         protected abstract void Listener();

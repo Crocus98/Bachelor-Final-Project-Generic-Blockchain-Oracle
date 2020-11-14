@@ -22,7 +22,7 @@ namespace Oracle888730.Classes
         {
             try
             {
-                Event requestEvent = GetRequestEvent();
+                Event requestEvent = GetEvent("RequestEvent");
                 HexBigInteger latestBlock = RetrieveLatestBlockToRead(requestEvent);
                 StringWriter.Enqueue(message + " Listener started");
                 //INIZIO LOOP 
@@ -50,7 +50,10 @@ namespace Oracle888730.Classes
         private HexBigInteger RetrieveLatestBlockToRead(Event _requestEvent)
         {
             HexBigInteger latestBlock;
-            if (config.Oracle.LatestBlock == null)
+            var filter = _requestEvent.CreateFilterAsync();
+            filter.Wait();
+            latestBlock = filter.Result;
+            /*if (config.Oracle.LatestBlock == null)
             {
                 var filter = _requestEvent.CreateFilterAsync();
                 filter.Wait();
@@ -61,20 +64,10 @@ namespace Oracle888730.Classes
             else
             {
                 latestBlock = new HexBigInteger(config.Oracle.LatestBlock);
-            }
+            }*/
             return latestBlock;
         }
 
-        private Event GetRequestEvent()
-        {
-            StringWriter.Enqueue(message + " Listener setup started...");
-            var contract = web3.Eth.GetContract(
-                config.Oracle.Abi,
-                config.Oracle.ContractAddress
-            );
-            Event requestEvent = contract.GetEvent("RequestEvent");
-            return requestEvent;
-        }
 
         protected override void ExceptionHandler(Task _taskRequestListener)
         {
