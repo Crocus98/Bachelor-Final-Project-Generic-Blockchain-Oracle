@@ -9,23 +9,60 @@ using Oracle888730.OracleEF;
 using Oracle888730.OracleEF.Models;
 using System.Numerics;
 using Oracle888730.Enums;
+using System.Collections.Generic;
+using System.Threading;
+using System.Linq;
 
 namespace Oracle888730.Classes
 {
     class RequestHandler : GenericHandler<RequestEventEventDTO>
     {
- 
-        public RequestHandler(Web3 _web3, Config _config, EventLog<RequestEventEventDTO> _eventLog) : base (_web3, _config,  _eventLog)
+        private static List<EventLog<RequestEventEventDTO>> handledEventLogList;
+
+        public RequestHandler(Web3 _web3, Config _config) : base (_web3, _config)
         {
             message = "[RequestHandler]";
+            handledEventLogList = new List<EventLog<RequestEventEventDTO>>();
+        }
+
+        public static void Enqueue(List<EventLog<RequestEventEventDTO>> _requests)
+        {
+            //Monitor.TryEnter(handledEventLogList);
+            lock (handledEventLogList) {
+                handledEventLogList.AddRange(_requests);
+            }
+            //Monitor.Exit(handledEventLogList);
         }
 
         protected override void Handler()
         {
-            int requestType = (int)handledEventLog.Event.RequestType;
-            string address = handledEventLog.Event.Sender;
-            string stringForApi = new CurrencyChangesEnum().EnumStringConversion(requestType);
+            while (true)
+            {
+                List<EventLog<RequestEventEventDTO>> temporaryList;
+                //Monitor.TryEnter(handledEventLogList);
+                lock (handledEventLogList) { 
+                    temporaryList = new List<EventLog<RequestEventEventDTO>>(handledEventLogList);
+                    handledEventLogList.Clear();
+                }
+                //Monitor.Exit(handledEventLogList);
+                if(temporaryList.Count > 0)
+                {
+                    temporaryList.ForEach(changes => {
+                        HandleSingleRequest(changes);
+                    });
+                }
+                else
+                {
+                    Thread.Sleep(1000);
+                }
+            }
+        }
 
+        protected override void HandleSingleRequest(EventLog<RequestEventEventDTO> _eventLog)
+        {
+            int requestType = (int)_eventLog.Event.RequestType;
+            string address = _eventLog.Event.Sender;
+            string stringForApi = new CurrencyChangesEnum().EnumStringConversion(requestType);
             if (stringForApi == "Error")
             {
                 StringWriter.Enqueue(message + " Failed request for inexistent service: " + requestType + " From: " + address);
@@ -42,12 +79,6 @@ namespace Oracle888730.Classes
                     );
                 StringWriter.Enqueue(message + " Successfull request for service: " + requestType + " From: " + address);
             }
-        }
-
-        protected override void ExceptionHandler(Task _taskHandler)
-        {
-            var exception = _taskHandler.Exception;
-            Console.WriteLine(message + "[ERROR] " + exception.Message);
         }
     }
 }

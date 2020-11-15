@@ -20,12 +20,7 @@ namespace Oracle888730.Classes
             message = "[SubscribeListener]";
         }
 
-        protected override void ExceptionHandler(Task _taskRequestListener)
-        {
-            var exception = _taskRequestListener.Exception;
-            Console.WriteLine(message + "[ERROR] " + exception.Message);
-        }
-        protected override void Listener()
+        protected override async void Listener()
         {
             try
             {
@@ -36,11 +31,10 @@ namespace Oracle888730.Classes
                 //INIZIO LOOP 
                 while (true)
                 {
-                    var changes = subscribeEvent.GetFilterChanges<SubscribeEventEventDTO>(latestBlock);
-                    changes.Wait();
-                    if (changes.Result.Count > 0)
+                    var changes = await subscribeEvent.GetFilterChanges<SubscribeEventEventDTO>(latestBlock);
+                    if (changes.Count > 0)
                     {
-                        changes.Result.ForEach(request =>
+                        changes.ForEach(request =>
                         {
                             string address = request.Event.Sender;
                             int requestType = (int)request.Event.RequestType;
@@ -54,7 +48,7 @@ namespace Oracle888730.Classes
                                         RequestType = requestType
                                     });
                                 }
-                                StringWriter.Enqueue(message + " Completed subscription for service: " + requestType + " from address: " + address);
+                                StringWriter.Enqueue(message + " Successfull subscription for service: " + requestType + " from address: " + address);
                             }
                             else
                             {
@@ -63,7 +57,10 @@ namespace Oracle888730.Classes
                             
                         });
                     }
-                    Thread.Sleep(1000);
+                    else
+                    {
+                        Thread.Sleep(1000);
+                    }
                 }
             }
             catch (Exception e)

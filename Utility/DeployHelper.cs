@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.IO;
 using Oracle888730.Classes;
 using Flurl.Util;
+using System.Threading;
 
 namespace Oracle888730.Utility
 {
@@ -39,10 +40,15 @@ namespace Oracle888730.Utility
 
         public void StartListener()
         {
-            List<Task> listeners = new List<Task>();
-            listeners.Add(new RequestListener(web3, config).Start());
-            listeners.Add(new SubscribeListener(web3, config).Start());
-            Task.WaitAll(listeners.ToArray());
+            List<Thread> threadList = new List<Thread>();
+            threadList.Add(new RequestListener(web3, config).Start());
+            threadList.Add(new SubscribeListener(web3, config).Start());
+            threadList.Add(new RequestHandler(web3, config).Start());
+            threadList.Add(new CoinbaseListener(web3, config).Start());
+            threadList.ForEach(x =>
+            {
+                x.Join();
+            });
         }
 
         private async Task DeployAsync(Config _config)

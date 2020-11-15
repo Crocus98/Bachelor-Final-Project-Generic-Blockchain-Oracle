@@ -6,6 +6,8 @@ using Oracle888730.Utility;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Contracts;
 using Oracle888730.Contracts.Oracle888730;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace Oracle888730.Classes
 {
@@ -14,28 +16,26 @@ namespace Oracle888730.Classes
         //protected Web3 web3;
         protected Config config;
         protected Oracle888730Service contractService;
-        protected EventLog<T> handledEventLog;
         protected CallAPIHelper callApiHelper;
         protected string message;
 
-        public GenericHandler(Web3 _web3, Config _config, EventLog<T> _eventLog)
+        public GenericHandler(Web3 _web3, Config _config)
         {
-            //this.web3 = _web3;
             this.config = _config;
-            contractService = new Oracle888730Service(_web3,_config.Oracle.ContractAddress);
-            this.handledEventLog = _eventLog;
+            this.contractService = new Oracle888730Service(_web3,_config.Oracle.ContractAddress);
             callApiHelper = new CallAPIHelper();
         }
 
-        public void Start()
+        public Thread Start()
         {
-            Task taskHandler = new Task(Handler);
-            taskHandler.ContinueWith(ExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
-            taskHandler.Start();
+            Thread threadHandler = new Thread(Handler);
+            threadHandler.Start();
+            return threadHandler;
         }
 
         protected abstract void Handler();
 
-        protected abstract void ExceptionHandler(Task _taskHandler);
+        protected abstract void HandleSingleRequest(EventLog<T> _eventLog);
+
     }
 }

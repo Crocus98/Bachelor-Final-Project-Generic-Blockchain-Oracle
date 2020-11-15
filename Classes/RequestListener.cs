@@ -18,7 +18,7 @@ namespace Oracle888730.Classes
             message = "[RequestListener]";
         }
 
-        protected override void Listener()
+        protected override async void Listener()
         {
             try
             {
@@ -28,16 +28,15 @@ namespace Oracle888730.Classes
                 //INIZIO LOOP 
                 while (true)
                 {
-                    var changes = requestEvent.GetFilterChanges<RequestEventEventDTO>(latestBlock);
-                    changes.Wait();
-                    if (changes.Result.Count > 0)
+                    var changes = await requestEvent.GetFilterChanges<RequestEventEventDTO>(latestBlock);
+                    if (changes.Count > 0)
                     {
-                        changes.Result.ForEach(request =>
-                        {
-                            new RequestHandler(web3, config, request).Start();
-                        });
+                        RequestHandler.Enqueue(changes);
                     }
-                    Thread.Sleep(1000);
+                    else
+                    {
+                        Thread.Sleep(1000);
+                    }
                 }
             }
             catch (Exception e)
@@ -68,13 +67,6 @@ namespace Oracle888730.Classes
             return latestBlock;
         }
 
-
-        protected override void ExceptionHandler(Task _taskRequestListener)
-        {
-            var exception = _taskRequestListener.Exception;
-            Console.WriteLine(message+"[ERROR] " + exception.Message + ". Program closing...");
-            Config.Exit();
-        }
     }
 
 }

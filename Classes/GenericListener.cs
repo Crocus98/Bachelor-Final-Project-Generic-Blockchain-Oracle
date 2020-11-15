@@ -3,6 +3,7 @@ using Nethereum.Web3;
 using Oracle888730.Contracts.Oracle888730;
 using Oracle888730.Utility;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Oracle888730.Classes
 {
@@ -20,12 +21,12 @@ namespace Oracle888730.Classes
             contractService = new Oracle888730Service(web3, config.Oracle.ContractAddress);
         }
 
-        public Task Start()
+        public Thread Start()
         {
-            Task taskListener = new Task(Listener);
-            taskListener.ContinueWith(ExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
-            taskListener.Start();
-            return taskListener;
+            Thread threadListener = new Thread(Listener);
+            threadListener.Start();
+            return threadListener;
+               
         }
 
         protected Event GetEvent(string _eventName)
@@ -40,7 +41,5 @@ namespace Oracle888730.Classes
         }
 
         protected abstract void Listener();
-
-        protected abstract void ExceptionHandler(Task _taskListener);
     }
 }
