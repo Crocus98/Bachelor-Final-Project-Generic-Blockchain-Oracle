@@ -1,4 +1,5 @@
-﻿using Nethereum.Contracts;
+﻿using Microsoft.EntityFrameworkCore;
+using Nethereum.Contracts;
 using Nethereum.Web3;
 using Oracle888730.Contracts.Oracle888730;
 using Oracle888730.Contracts.Oracle888730.ContractDefinition;
@@ -30,10 +31,7 @@ namespace Oracle888730.Classes
                 {
                     Monitor.Wait(waitTimeOut, TimeSpan.FromMilliseconds(3600 * 1000));
                 }
-                if (true)
-                {
-
-                }
+                
             }
         }
 
