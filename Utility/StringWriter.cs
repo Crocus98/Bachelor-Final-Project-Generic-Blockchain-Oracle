@@ -19,6 +19,7 @@ namespace Oracle888730.Utility
             stringsToBeWritten = new Queue<string>();
             message = "[StringWriter]";
             this.Start();
+            StringWriter.Enqueue(message + " Service started successfully...");
         }
 
         public void Start()

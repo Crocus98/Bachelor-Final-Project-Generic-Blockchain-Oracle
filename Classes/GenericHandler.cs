@@ -8,6 +8,7 @@ using Nethereum.Contracts;
 using Oracle888730.Contracts.Oracle888730;
 using System.Collections.Generic;
 using System.Threading;
+using Oracle888730.OracleEF.Models;
 
 namespace Oracle888730.Classes
 {
@@ -35,7 +36,10 @@ namespace Oracle888730.Classes
 
         protected abstract void Handler();
 
-        protected abstract void HandleSingleRequest(EventLog<T> _eventLog);
+        protected virtual void HandleSingleRequest(EventLog<T> _eventLog)
+        {
+
+        }
 
     }
 }

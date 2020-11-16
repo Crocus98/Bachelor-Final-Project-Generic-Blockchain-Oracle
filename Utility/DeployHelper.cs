@@ -44,7 +44,7 @@ namespace Oracle888730.Utility
             threadList.Add(new RequestListener(web3, config).Start());
             threadList.Add(new SubscribeListener(web3, config).Start());
             threadList.Add(new RequestHandler(web3, config).Start());
-            threadList.Add(new CoinbaseListener(web3, config).Start());
+            threadList.Add(new CoinbaseHandler(web3, config).Start());
             threadList.ForEach(x =>
             {
                 x.Join();
