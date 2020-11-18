@@ -8,20 +8,18 @@ using Oracle888730.Contracts.Oracle888730.ContractDefinition;
 using Oracle888730.OracleEF;
 using Oracle888730.OracleEF.Models;
 using System.Numerics;
-using Oracle888730.Enums;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 
-namespace Oracle888730.Classes
+namespace Oracle888730.Classes.Handlers
 {
-    class RequestHandler : GenericHandler<RequestEventEventDTO>
+    class RequestHandler : GenericRequestHandler
     {
         private static List<EventLog<RequestEventEventDTO>> handledEventLogList;
 
         public RequestHandler(Web3 _web3, Config _config) : base (_web3, _config)
         {
-            message = "[RequestHandler]";
             handledEventLogList = new List<EventLog<RequestEventEventDTO>>();
         }
 
@@ -60,25 +58,38 @@ namespace Oracle888730.Classes
 
         protected override void HandleSingleRequest(EventLog<RequestEventEventDTO> _eventLog)
         {
-            int requestType = (int)_eventLog.Event.RequestType;
+            string requestType = _eventLog.Event.RequestService;
+            int requestTypeValue = (int)_eventLog.Event.RequestServiceType;
             string address = _eventLog.Event.Sender;
-            string stringForApi = new CurrencyChangesEnum().EnumStringConversion(requestType);
-            if (stringForApi == "Error")
+
+            var service = ModulesHelper.GetInstance(requestType);
+            if(service == null)
             {
                 StringWriter.Enqueue(message + " Failed request for inexistent service: " + requestType + " From: " + address);
-            }
-            else
+            } else
             {
-                var value = callApiHelper.GetWantedValue(stringForApi);
-                value.Wait();
-                //Using the same instance of Web3 across services, there is a nonce manager (in memory) that will ensure that your transactions are in the right order (safe thread too)
-                var res = contractService.SendResponseRequestAndWaitForReceiptAsync(
-                        clientAddress: address,
-                        value: value.Result,
-                        requestType: requestType
-                    );
+                // TODO Restituisci risultato
                 StringWriter.Enqueue(message + " Successfull request for service: " + requestType + " From: " + address);
             }
+
+            //string stringForApi = new CurrencyChangesEnum().EnumStringConversion(requestType);
+            //if (stringForApi == "Error")
+            //{
+            //    StringWriter.Enqueue(message + " Failed request for inexistent service: " + requestType + " From: " + address);
+            //}
+            //else
+            //{
+            //    var value = callApiHelper.GetWantedValue(stringForApi);
+            //    value.Wait();
+            //    //Using the same instance of Web3 across services, there is a nonce manager (in memory) that will ensure that your transactions are in the right order (safe thread too)
+            //    var res = contractService.SendResponseRequestAndWaitForReceiptAsync(
+            //            clientAddress: address,
+            //            value: value.Result,
+            //            service: ,
+            //            serviceType: 
+            //        );
+            //    StringWriter.Enqueue(message + " Successfull request for service: " + requestType + " From: " + address);
+            //}
         }
     }
 }

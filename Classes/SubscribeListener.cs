@@ -2,14 +2,12 @@
 using Nethereum.Hex.HexTypes;
 using Nethereum.Web3;
 using Oracle888730.Contracts.Oracle888730.ContractDefinition;
-using Oracle888730.Enums;
 using Oracle888730.OracleEF;
 using Oracle888730.OracleEF.Models;
 using Oracle888730.Utility;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using static Oracle888730.Enums.CurrencyChangesEnum;
 
 namespace Oracle888730.Classes
 {
@@ -22,8 +20,10 @@ namespace Oracle888730.Classes
 
         protected override async void Listener()
         {
+            /*
             try
             {
+                
                 Event subscribeEvent = GetEvent("SubscribeEvent");
                 HexBigInteger latestBlock = RetrieveLatestBlockToRead(subscribeEvent);
                 StringWriter.Enqueue(message + " Listener started");
@@ -37,24 +37,26 @@ namespace Oracle888730.Classes
                         changes.ForEach(request =>
                         {
                             string address = request.Event.Sender;
-                            int requestType = (int)request.Event.RequestType;
-                            if(Enum.IsDefined(typeof(CurrencyChanges), requestType))
+                            string serviceType = request.Event.SubscribeService;
+                            int serviceTypeValue = (int)request.Event.SubscribeServiceType;
+                            var service = ModulesHelper.GetInstance(serviceType);
+                            if(service == null)
+                            {
+                                StringWriter.Enqueue(message + " Failed subscription for non existent service: " + serviceType + " from address: " + address);
+                            }
+                            else
                             {
                                 using (var db = new OracleContext())
                                 {
                                     db.AddSubscriber(new Subscriber
                                     {
                                         Address = address,
-                                        RequestType = requestType
+                                        Service = serviceType,
+                                        ServiceType = serviceTypeValue
                                     });
                                 }
-                                StringWriter.Enqueue(message + " Successfull subscription for service: " + requestType + " from address: " + address);
+                                StringWriter.Enqueue(message + " Successfull subscription for service: " + serviceType + " from address: " + address);
                             }
-                            else
-                            {
-                                StringWriter.Enqueue(message + " Failed subscription for non existent service: " + requestType + " from address: " + address);
-                            }
-                            
                         });
                     }
                     else
@@ -67,6 +69,7 @@ namespace Oracle888730.Classes
             {
                 throw e;
             }
+            */
         }
 
         private HexBigInteger RetrieveLatestBlockToRead(Event _subscribeEvent)

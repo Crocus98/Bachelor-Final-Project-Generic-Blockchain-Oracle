@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 using Oracle888730.Utility;
 
 using Nethereum.ABI.FunctionEncoding.Attributes;
+using Oracle888730.Classes.Handlers;
 
-namespace Oracle888730.Classes
+namespace Oracle888730.Classes.Listeners
 {
     class RequestListener : GenericListener
     {
@@ -24,8 +25,7 @@ namespace Oracle888730.Classes
             {
                 Event requestEvent = GetEvent("RequestEvent");
                 HexBigInteger latestBlock = RetrieveLatestBlockToRead(requestEvent);
-                StringWriter.Enqueue(message + " Listener started");
-                //INIZIO LOOP 
+                StringWriter.Enqueue(message + " Listener started"); 
                 while (true)
                 {
                     var changes = await requestEvent.GetFilterChanges<RequestEventEventDTO>(latestBlock);

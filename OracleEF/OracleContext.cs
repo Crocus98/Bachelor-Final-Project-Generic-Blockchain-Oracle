@@ -3,6 +3,8 @@ using Oracle888730.OracleEF.Models;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace Oracle888730.OracleEF
@@ -10,6 +12,10 @@ namespace Oracle888730.OracleEF
     partial class OracleContext : DbContext
     {
         public DbSet<Subscriber> Subscribers { get; set; }
+
+        public DbSet<Service> Services { get; set; }
+
+        public DbSet<ServiceType> ServiceTypes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -21,7 +27,23 @@ namespace Oracle888730.OracleEF
             base.OnConfiguring(optionsBuilder);
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder) { }
+        protected override void OnModelCreating(ModelBuilder modelBuilder) 
+        {
+            modelBuilder.Entity<Service>(x =>
+            {
+                x.HasIndex(e => e.ServiceName).IsUnique();
+            });
+            modelBuilder.Entity<ServiceType>().
+                HasOne(x => x.Service).
+                WithMany(x => x.ServiceTypes).
+                HasForeignKey(x => x.ServiceForeignKey).
+                HasConstraintName("FK_ServiceType_Service_ServiceId");
+            modelBuilder.Entity<Subscriber>().
+                HasOne(x => x.ServiceType).
+                WithMany(x => x.Subscribers).
+                HasForeignKey(x => x.ServiceTypeForeignKey).
+                HasConstraintName("FK_Subscriber_ServiceType_ServiceTypeId");
+        }
 
 
     }

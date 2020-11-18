@@ -17,9 +17,42 @@ namespace Oracle888730.OracleEF
 
         public int GetCount()
         {
-            return Subscribers.Count();
+            int i = 0;
+            using (var db = new OracleContext())
+            {
+                ServiceTypes.Count();
+            }
+            return i;
+        }
+        public Subscriber GetDatas()
+        {
+            Subscriber a = new Subscriber();
+            using (var db = new OracleContext())
+            {
+                a = db.Subscribers.First();
+            }
+            Console.WriteLine("address "+a.Address + " servicetype " + a.SubscriberId + " foreignkey " + a.ServiceTypeForeignKey + " Coinbase" + a.ServiceType.Service.ServiceName);
+            return a;
         }
 
+        public void PutDatas()
+        {
+            Subscriber a = new Subscriber();
+            a.Address = "ASDASD";
+            a.ServiceType.ServiceTypeString = "ETH-USD";
+            a.ServiceType.ServiceTypeId = 1;
+            a.ServiceType.Service.ServiceId = 1;
+            a.ServiceType.Service.ServiceName = "COINBASE";
+            a.ServiceType.Service.ServiceId = 1;
+            using (var db = new OracleContext())
+            {
+                db.Subscribers.Add(a);
+                db.SaveChanges();
+            }
+            Console.WriteLine("address " + a.Address + " servicetype " + a.SubscriberId + " foreignkey " + a.ServiceTypeForeignKey + " " + a.ServiceType.Service.ServiceName);
+        }
+
+        /*
         public Subscriber GetFromAddress(string _address)
         {
             return Subscribers
@@ -42,5 +75,6 @@ namespace Oracle888730.OracleEF
         {
             return Subscribers.Where(x => x.RequestType == _subscriptionType).ToList();
         }
+        */
     }
 }

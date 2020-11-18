@@ -29,12 +29,14 @@ contract Oracle888730 {
 
     event RequestEvent(
          address _sender,
-         uint _requestType
+         string _requestService,
+         uint _requestServiceType
     );
 
     event SubscribeEvent(
         address _sender,
-        uint _requestType
+        string _subscribeService,
+        uint _subscribeServiceType
     );
 
     modifier onlyOracleOwner() {
@@ -67,20 +69,20 @@ contract Oracle888730 {
     }
 
     //Push based inbound oracle request
-    function GetSubscribeRequest(uint _requestType) external payable {
-        emit SubscribeEvent(msg.sender, _requestType);
+    function GetSubscribeRequest(string calldata _service, uint _serviceType) external payable {
+        emit SubscribeEvent(msg.sender, _service, _serviceType);
     }
 
     //Pull based inbound oracle request
-    function GetRequest(uint _requestType) external payable {
-        emit RequestEvent(msg.sender, _requestType);
+    function GetRequest(string calldata _service, uint _serviceType) external payable {
+        emit RequestEvent(msg.sender, _service, _serviceType);
     }
     
     //Response
-    function SendResponse(address _clientAddress, string memory _value, uint _requestType) public onlyOracleOwner {
+    function SendResponse(address _clientAddress,string memory _service, uint  _serviceType, string memory _value) public onlyOracleOwner {
         //_value potrebbe essere un JSON
         Client888730 client = Client888730(address(_clientAddress));
-        client.GetResponse(_value, _requestType);
+        client.GetResponse(_service, _serviceType, _value);
     }
 
     //Public: functions are part of the contract interface and can be either called internally or via messages. For public state variables, an automatic getter function (see below) is generated.

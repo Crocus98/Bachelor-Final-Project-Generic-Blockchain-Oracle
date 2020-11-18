@@ -3,7 +3,6 @@ using Nethereum.Contracts;
 using Nethereum.Web3;
 using Oracle888730.Contracts.Oracle888730;
 using Oracle888730.Contracts.Oracle888730.ContractDefinition;
-using Oracle888730.Enums;
 using Oracle888730.OracleEF;
 using Oracle888730.OracleEF.Models;
 using Oracle888730.Utility;
@@ -36,7 +35,7 @@ namespace Oracle888730.Classes
             Thread.Sleep(2000);
             while (true)
             {
-                stopWatch.Start();
+                /*stopWatch.Start();
                 List<CurrencyChangesEnum.CurrencyChanges> changes = Enum.GetValues(typeof(CurrencyChangesEnum.CurrencyChanges)).Cast<CurrencyChangesEnum.CurrencyChanges>().ToList();
                 changes.ForEach(x => {
                     List<Subscriber> temporaryList = new List<Subscriber>();
@@ -62,24 +61,30 @@ namespace Oracle888730.Classes
                 lock (waitTimeOut)
                 {
                     Monitor.Wait(waitTimeOut, TimeSpan.FromMilliseconds((3600 * 1000)- stopWatch.Elapsed.TotalMilliseconds));
-                }
+                }*/
             }
         }
 
         protected void HandleSingleRequest(Subscriber _subscriber)
         {
-            //Da fare
-            int requestType = _subscriber.RequestType;
+
+           /* //Da fare
+            string service = _subscriber.Service;
+            int serviceType = _subscriber.ServiceType;
             string address = _subscriber.Address;
-            string stringForApi = new CurrencyChangesEnum().EnumStringConversion(requestType);
-            var value = callApiHelper.GetWantedValue(stringForApi);
-            value.Wait();
+            var handler = ModulesHelper.GetInstance(service);
+            if(handler == null)
+            {
+                return;
+            }
+            
             //Using the same instance of Web3 across services, there is a nonce manager (in memory) that will ensure that your transactions are in the right order (safe thread too)
             var res = contractService.SendResponseRequestAndWaitForReceiptAsync(
                 clientAddress: address,
                 value: value.Result,
-                requestType: requestType
-            );
+                service: service,
+                serviceType: serviceType
+            );*/
         }
     }
 }

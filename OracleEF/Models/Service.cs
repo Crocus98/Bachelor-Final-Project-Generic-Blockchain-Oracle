@@ -6,17 +6,15 @@ using System.Text;
 
 namespace Oracle888730.OracleEF.Models
 {
-    [Table("Subscribers")]
-    class Subscriber
+
+    [Table("Services")]
+    class Service
     {
         [Key]
-        public int SubscriberId { get; set; }
+        public int ServiceId { get; set; }
         [Required]
-        public string Address { get; set; }
+        public string ServiceName { get; set; }
 
-        public int ServiceTypeForeignKey { get; set; }
-
-        public ServiceType ServiceType{ get; set; }
-
+        public List<ServiceType> ServiceTypes { get; set; }
     }
 }

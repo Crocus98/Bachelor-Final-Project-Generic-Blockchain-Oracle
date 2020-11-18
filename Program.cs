@@ -14,10 +14,12 @@ namespace Oracle888730
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomainProcessExit);
             config = Config.Load();
             SetupDb();
-            StringWriter sw = new StringWriter();
-            DeployHelper deployHelper = new DeployHelper(config);
+            new OracleContext().GetDatas();
+            //StringWriter sw = new StringWriter();
+            /*DeployHelper deployHelper = new DeployHelper(config);
             deployHelper.ConnectOrDeploy();
-            deployHelper.StartListener();
+            deployHelper.StartListener();*/
+
         }
 
         static void CurrentDomainProcessExit(object sender, EventArgs e)

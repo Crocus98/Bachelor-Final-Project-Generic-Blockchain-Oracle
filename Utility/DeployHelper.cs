@@ -11,6 +11,8 @@ using System.IO;
 using Oracle888730.Classes;
 using Flurl.Util;
 using System.Threading;
+using Oracle888730.Classes.Listeners;
+using Oracle888730.Classes.Handlers;
 
 namespace Oracle888730.Utility
 {
@@ -40,7 +42,7 @@ namespace Oracle888730.Utility
 
         public void StartListener()
         {
-            List<Thread> threadList = new List<Thread>();
+            /*List<Thread> threadList = new List<Thread>();
             threadList.Add(new RequestListener(web3, config).Start());
             threadList.Add(new SubscribeListener(web3, config).Start());
             threadList.Add(new RequestHandler(web3, config).Start());
@@ -48,7 +50,7 @@ namespace Oracle888730.Utility
             threadList.ForEach(x =>
             {
                 x.Join();
-            });
+            });*/
         }
 
         private async Task DeployAsync(Config _config)

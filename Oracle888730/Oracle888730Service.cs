@@ -52,18 +52,20 @@ namespace Oracle888730.Contracts.Oracle888730
              return ContractHandler.SendRequestAndWaitForReceiptAsync(getRequestFunction, cancellationToken);
         }
 
-        public Task<string> GetRequestRequestAsync(BigInteger requestType)
+        public Task<string> GetRequestRequestAsync(string service, BigInteger serviceType)
         {
             var getRequestFunction = new GetRequestFunction();
-                getRequestFunction.RequestType = requestType;
+                getRequestFunction.Service = service;
+                getRequestFunction.ServiceType = serviceType;
             
              return ContractHandler.SendRequestAsync(getRequestFunction);
         }
 
-        public Task<TransactionReceipt> GetRequestRequestAndWaitForReceiptAsync(BigInteger requestType, CancellationTokenSource cancellationToken = null)
+        public Task<TransactionReceipt> GetRequestRequestAndWaitForReceiptAsync(string service, BigInteger serviceType, CancellationTokenSource cancellationToken = null)
         {
             var getRequestFunction = new GetRequestFunction();
-                getRequestFunction.RequestType = requestType;
+                getRequestFunction.Service = service;
+                getRequestFunction.ServiceType = serviceType;
             
              return ContractHandler.SendRequestAndWaitForReceiptAsync(getRequestFunction, cancellationToken);
         }
@@ -78,18 +80,20 @@ namespace Oracle888730.Contracts.Oracle888730
              return ContractHandler.SendRequestAndWaitForReceiptAsync(getSubscribeRequestFunction, cancellationToken);
         }
 
-        public Task<string> GetSubscribeRequestRequestAsync(BigInteger requestType)
+        public Task<string> GetSubscribeRequestRequestAsync(string service, BigInteger serviceType)
         {
             var getSubscribeRequestFunction = new GetSubscribeRequestFunction();
-                getSubscribeRequestFunction.RequestType = requestType;
+                getSubscribeRequestFunction.Service = service;
+                getSubscribeRequestFunction.ServiceType = serviceType;
             
              return ContractHandler.SendRequestAsync(getSubscribeRequestFunction);
         }
 
-        public Task<TransactionReceipt> GetSubscribeRequestRequestAndWaitForReceiptAsync(BigInteger requestType, CancellationTokenSource cancellationToken = null)
+        public Task<TransactionReceipt> GetSubscribeRequestRequestAndWaitForReceiptAsync(string service, BigInteger serviceType, CancellationTokenSource cancellationToken = null)
         {
             var getSubscribeRequestFunction = new GetSubscribeRequestFunction();
-                getSubscribeRequestFunction.RequestType = requestType;
+                getSubscribeRequestFunction.Service = service;
+                getSubscribeRequestFunction.ServiceType = serviceType;
             
              return ContractHandler.SendRequestAndWaitForReceiptAsync(getSubscribeRequestFunction, cancellationToken);
         }
@@ -141,22 +145,24 @@ namespace Oracle888730.Contracts.Oracle888730
              return ContractHandler.SendRequestAndWaitForReceiptAsync(sendResponseFunction, cancellationToken);
         }
 
-        public Task<string> SendResponseRequestAsync(string clientAddress, string value, BigInteger requestType)
+        public Task<string> SendResponseRequestAsync(string clientAddress, string service, BigInteger serviceType, string value)
         {
             var sendResponseFunction = new SendResponseFunction();
                 sendResponseFunction.ClientAddress = clientAddress;
+                sendResponseFunction.Service = service;
+                sendResponseFunction.ServiceType = serviceType;
                 sendResponseFunction.Value = value;
-                sendResponseFunction.RequestType = requestType;
             
              return ContractHandler.SendRequestAsync(sendResponseFunction);
         }
 
-        public Task<TransactionReceipt> SendResponseRequestAndWaitForReceiptAsync(string clientAddress, string value, BigInteger requestType, CancellationTokenSource cancellationToken = null)
+        public Task<TransactionReceipt> SendResponseRequestAndWaitForReceiptAsync(string clientAddress, string service, BigInteger serviceType, string value, CancellationTokenSource cancellationToken = null)
         {
             var sendResponseFunction = new SendResponseFunction();
                 sendResponseFunction.ClientAddress = clientAddress;
+                sendResponseFunction.Service = service;
+                sendResponseFunction.ServiceType = serviceType;
                 sendResponseFunction.Value = value;
-                sendResponseFunction.RequestType = requestType;
             
              return ContractHandler.SendRequestAndWaitForReceiptAsync(sendResponseFunction, cancellationToken);
         }

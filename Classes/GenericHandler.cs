@@ -35,11 +35,5 @@ namespace Oracle888730.Classes
         }
 
         protected abstract void Handler();
-
-        protected virtual void HandleSingleRequest(EventLog<T> _eventLog)
-        {
-
-        }
-
     }
 }

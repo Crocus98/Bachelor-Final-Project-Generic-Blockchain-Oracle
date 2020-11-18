@@ -6,7 +6,6 @@ using Coinbase;
 using System.Linq;
 using Coinbase.Models;
 using System.Threading;
-using Oracle888730.Enums;
 
 namespace Oracle888730.Utility
 {

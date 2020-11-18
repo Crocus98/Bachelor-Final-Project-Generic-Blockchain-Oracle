@@ -6,11 +6,18 @@ import "./Oracle888730.sol";
 contract Client888730 {
     address public clientOwner;
     address payable public oracleAddress;
-    string public a = "0";
+    Value public lastResponse;
+
+    struct Value {
+        string service;
+        uint serviceType;
+        string value;
+    }
 
     constructor(address payable _oracleAddress){
         clientOwner = msg.sender;
         oracleAddress = _oracleAddress;
+        lastResponse = Value("NO",0,"0");
     }
 
     modifier onlyClientOwner() {
@@ -24,23 +31,24 @@ contract Client888730 {
     }
 
     event ResponseEvent(
-        string value,
-        uint _requestType
+        string _service,
+        uint _type,
+        string _value
     ); 
 
-    function GetResponse(string calldata _value, uint _requestType) external payable onlyOracle{
-        a = _value;
-        emit ResponseEvent(_value, _requestType);
+    function GetResponse(string calldata _service, uint  _serviceType, string calldata _value) external payable onlyOracle{
+        lastResponse = Value(_service, _serviceType, _value);
+        emit ResponseEvent(_service, _serviceType, _value);
     }
 
-    function SendSubscribeRequest(uint _requestType) public onlyClientOwner{
+    function SendSubscribeRequest(string memory _subscribeService, uint _subscribeServiceType) public onlyClientOwner{
         Oracle888730 oracle = Oracle888730(oracleAddress);
-        oracle.GetSubscribeRequest(_requestType);
+        oracle.GetSubscribeRequest(_subscribeService, _subscribeServiceType);
     }
 
-    function SendRequest(uint _requestType) public onlyClientOwner{
+    function SendRequest(string memory _requestService, uint _requestServiceType) public onlyClientOwner{
         Oracle888730 oracle = Oracle888730(oracleAddress);
-        oracle.GetRequest(_requestType);
+        oracle.GetRequest(_requestService, _requestServiceType);
     }
 
 }
