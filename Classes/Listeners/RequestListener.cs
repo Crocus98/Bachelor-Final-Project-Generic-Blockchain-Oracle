@@ -9,6 +9,9 @@ using Oracle888730.Utility;
 
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Oracle888730.Classes.Handlers;
+using System.Security.Cryptography.X509Certificates;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace Oracle888730.Classes.Listeners
 {
@@ -25,33 +28,53 @@ namespace Oracle888730.Classes.Listeners
             {
                 Event requestEvent = GetEvent("RequestEvent");
                 HexBigInteger latestBlock = RetrieveLatestBlockToRead(requestEvent);
-                StringWriter.Enqueue(message + " Listener started"); 
+                StringWriter.Enqueue(message + " Listener started");
                 while (true)
                 {
                     var changes = await requestEvent.GetFilterChanges<RequestEventEventDTO>(latestBlock);
                     if (changes.Count > 0)
                     {
-                        RequestHandler.Enqueue(changes);
+                        changes.ForEach(x => {
+                            string service = x.Event.RequestService.ToUpper();
+                            Type type;
+                            if (handlers.ContainsKey(service))
+                            {
+                                type = handlers.GetValueOrDefault(service);
+                            }
+                            else
+                            {
+                                type = ModulesHelper.GetType(service, handlersNameSpace);
+                                handlers.Add(service,type);
+                            }
+                            if (type != null)
+                            {
+                                IGenericHandler currentType = ModulesHelper.GetInstance<IGenericHandler>(type, new object[] { web3, config, message });
+                                currentType.Start(x.Event);
+                            }
+                        });
                     }
                     else
                     {
-                        Thread.Sleep(1000);
+                        Thread.Sleep(100);
                     }
                 }
             }
             catch (Exception e)
             {
-                throw e;
+                StringWriter.Enqueue(message + "[ERROR] Exception stopped the request listener thread " + e.Message );
+                Listener();
             }
             
         }
 
         private HexBigInteger RetrieveLatestBlockToRead(Event _requestEvent)
         {
+            // TODO
             HexBigInteger latestBlock;
             var filter = _requestEvent.CreateFilterAsync();
             filter.Wait();
             latestBlock = filter.Result;
+            return latestBlock;
             /*if (config.Oracle.LatestBlock == null)
             {
                 var filter = _requestEvent.CreateFilterAsync();
@@ -64,7 +87,6 @@ namespace Oracle888730.Classes.Listeners
             {
                 latestBlock = new HexBigInteger(config.Oracle.LatestBlock);
             }*/
-            return latestBlock;
         }
 
     }

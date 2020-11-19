@@ -7,7 +7,7 @@ using System.Text;
 namespace Oracle888730.OracleEF.Models
 {
     [Table("Subscribers")]
-    class Subscriber
+    public class Subscriber
     {
         [Key]
         public int SubscriberId { get; set; }

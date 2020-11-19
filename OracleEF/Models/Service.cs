@@ -8,7 +8,7 @@ namespace Oracle888730.OracleEF.Models
 {
 
     [Table("Services")]
-    class Service
+    public class Service
     {
         [Key]
         public int ServiceId { get; set; }

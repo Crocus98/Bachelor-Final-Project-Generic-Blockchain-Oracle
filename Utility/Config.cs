@@ -64,8 +64,16 @@ namespace Oracle888730.Utility
 
         public void Save()
         {
-            string jsonString = JsonSerializer.Serialize<Config>(this);
-            File.WriteAllText(fileName, jsonString);
+            try
+            {
+                string jsonString = JsonSerializer.Serialize<Config>(this);
+                File.WriteAllText(fileName, jsonString);
+            }
+            catch 
+            {
+                Console.WriteLine("[ERROR] Impossible to save config datas.");
+                Exit();
+            }
         }
     }
     public class RpcServer

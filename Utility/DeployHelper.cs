@@ -13,6 +13,7 @@ using Flurl.Util;
 using System.Threading;
 using Oracle888730.Classes.Listeners;
 using Oracle888730.Classes.Handlers;
+using System.Reflection;
 
 namespace Oracle888730.Utility
 {
@@ -22,9 +23,11 @@ namespace Oracle888730.Utility
         public static Web3 web3;
         public static Oracle888730Service contractService;
         private Config config;
+        private string listenersNameSpace;
 
         public DeployHelper(Config _config) {
             config = _config;
+            listenersNameSpace = "Classes.Listeners";
         } 
 
         public void ConnectOrDeploy() {
@@ -37,20 +40,23 @@ namespace Oracle888730.Utility
             {
                 DeployAsync(config).Wait();
             }
-            StartListener();
+
         }
 
         public void StartListener()
         {
-            /*List<Thread> threadList = new List<Thread>();
-            threadList.Add(new RequestListener(web3, config).Start());
-            threadList.Add(new SubscribeListener(web3, config).Start());
-            threadList.Add(new RequestHandler(web3, config).Start());
-            threadList.Add(new CoinbaseHandler(web3, config).Start());
+            List<Thread> threadList = new List<Thread>();
+            List<Type> listeners = ModulesHelper.GetTypes(listenersNameSpace);
+            listeners.ForEach(x =>
+            {
+                GenericListener current = ModulesHelper.GetInstance<GenericListener>(x, new object[] {web3, config });
+                threadList.Add(current.Start());
+                // GG <3
+            });
             threadList.ForEach(x =>
             {
                 x.Join();
-            });*/
+            });
         }
 
         private async Task DeployAsync(Config _config)

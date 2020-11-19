@@ -7,7 +7,7 @@ using System.Text;
 namespace Oracle888730.OracleEF.Models
 {
     [Table("ServiceTypes")]
-    class ServiceType
+    public class ServiceType
     {
         [Key]
         public int ServiceTypeId { get; set; }

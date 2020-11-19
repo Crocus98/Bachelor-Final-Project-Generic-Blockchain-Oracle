@@ -30,19 +30,10 @@ namespace Oracle888730.Utility
 
         public static void Enqueue(string _stringToEnqueue)
         {
-            //Monitor.TryEnter(stringsToBeWritten);
             lock (stringsToBeWritten) { 
-                stringsToBeWritten.Enqueue(_stringToEnqueue); 
+                stringsToBeWritten.Enqueue(_stringToEnqueue);
             }
-            //Monitor.Exit(stringsToBeWritten);
-
         }
-
-        /*private void ExceptionHandler(Task _writeMessages)
-        {
-            var exception = _writeMessages.Exception;
-            Console.WriteLine(message + "[ERROR] " + exception.Message);
-        }*/
 
         private void DoWork()
         {

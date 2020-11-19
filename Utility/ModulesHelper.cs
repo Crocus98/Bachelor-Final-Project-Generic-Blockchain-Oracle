@@ -14,31 +14,37 @@ namespace Oracle888730.Utility
             var moduleList = Assembly.GetExecutingAssembly().GetTypes().Where(x => x.IsClass && x.Namespace == moduleNamespace).ToList();
             moduleList.ForEach(x => Console.WriteLine(x.Name));
         */
-        private static string Namespace = "Classes.Handlers";
-        private static Type GetHandler(string serviceName)
+        private static string assemblyName = "Oracle88730.";
+        public static Type  GetType(string _serviceName, string _nameSpace)
         {
-            return Assembly.GetExecutingAssembly().GetTypes()
+            var r = Assembly
+                .GetExecutingAssembly()
+                .GetTypes()
                 .Where(x =>
                     x.IsClass &&
-                    x.Namespace == Namespace &&
-                    x.Name.Contains(serviceName.ToUpper())
+                    x.ReflectedType == null &&
+                    x.Namespace.EndsWith(_nameSpace) &&
+                    x.Name.Contains(_serviceName.ToUpper())
                 ).FirstOrDefault();
+            return r;
         }
 
-        public static List<Type> GetHandlers()
+        public static List<Type> GetTypes(string _nameSpace)
         {
-            return Assembly.GetExecutingAssembly().GetTypes()
+            return Assembly
+                .GetExecutingAssembly()
+                .GetTypes()
                 .Where(x =>
                     x.IsClass &&
-                    x.Namespace == Namespace
+                    x.ReflectedType == null &&
+                    x.Namespace.EndsWith(_nameSpace)
                 ).ToList();
         }
 
-        public static GenericRequestHandler GetInstance(string serviceName)
+
+        public static T GetInstance<T>(Type _type, object[] _p = null)
         {
-            var handler = GetHandler(serviceName);
-            if (handler == null) return null;
-            return Activator.CreateInstance(handler) as GenericRequestHandler;
+            return Activator.CreateInstance(_type, _p) as dynamic;
         }
     }
 }
