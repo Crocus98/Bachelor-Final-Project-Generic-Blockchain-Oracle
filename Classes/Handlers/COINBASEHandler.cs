@@ -15,13 +15,17 @@ using Org.BouncyCastle.Ocsp;
 using Oracle888730.Utility.ApiHelpers;
 using Flurl.Util;
 using Nethereum.RPC.Eth.DTOs;
+using Oracle888730.Contracts.Oracle888730;
+using Nethereum.RPC.NonceServices;
+using Nethereum.Web3.Accounts;
+using Nethereum.RPC.Web3;
 
 namespace Oracle888730.Classes.Handlers
 {
     class COINBASEHandler : GenericHandler
     {
 
-        public COINBASEHandler(Web3 _web3, Config _config, string _callerMessage) : base (_web3, _config)
+        public COINBASEHandler(Web3 _web3, Config _config, Account _account, InMemoryNonceService _inMemoryNonceService, string _callerMessage ) : base (_web3, _config, _account, _inMemoryNonceService)
         {
             message = _callerMessage+"[CoinbaseHandler]";
             apiHelper = new COINBASEAPIHelper();
@@ -48,26 +52,15 @@ namespace Oracle888730.Classes.Handlers
                 var coinbaseRequest = new COINBASEAPIHelper().GetWantedValue(serviceType.ServiceTypeString);
                 coinbaseRequest.Wait();
                 string requestedValue = coinbaseRequest.Result;
-                Task<TransactionReceipt> receipt = null;
-                int i = 0;
-                do
-                {
-                    try
-                    {
-                        receipt = contractService.SendResponseRequestAndWaitForReceiptAsync(
-                                clientAddress: senderAddress,
-                                service: requestService,
-                                serviceType: requestServiceType,
-                                value: requestedValue
-                            );
-                        i++;
-                        receipt.Wait();
-                    }
-                    catch(Exception e)
-                    {
-                        StringWriter.Enqueue(message + "First attempt failed. Retrying...");
-                    }
-                } while (i < 3 && receipt.Result.Status.Value == 0);
+                var futureNonceAsync = account.NonceService.ResetNonce();
+                futureNonceAsync.Wait();
+                var receipt = contractService.SendResponseRequestAndWaitForReceiptAsync(
+                    clientAddress: senderAddress,
+                    service: requestService,
+                    serviceType: requestServiceType,
+                    value: requestedValue
+                    );
+                receipt.Wait();
                 // Esito risposta
                 if(receipt.Result.Status.Value == 1)
                 {

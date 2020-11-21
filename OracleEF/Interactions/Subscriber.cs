@@ -13,10 +13,13 @@ namespace Oracle888730.OracleEF
 {
     partial class OracleContext
     {
-        public bool AddSubscriber(Subscriber _subscriber)
+        public static bool AddSubscriber(Subscriber _subscriber)
         {
-            Subscribers.Add(_subscriber);
-            return this.SaveChanges() > 0;
+            using (var _context = new OracleContext())
+            {
+                _context.Subscribers.Add(_subscriber);
+                return _context.SaveChanges() > 0;
+            }
         }
 
         public List<Subscriber> GetSubscribers(string _service = null, int? _serviceType = null)

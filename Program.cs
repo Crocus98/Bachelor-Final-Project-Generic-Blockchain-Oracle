@@ -11,8 +11,8 @@ namespace Oracle888730
         public static OracleContext db;
         static void Main(string[] args)
         {
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomainProcessExit);
             config = Config.Load();
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomainProcessExit);
             SetupDb();
             StringWriter sw = new StringWriter();
             DeployHelper deployHelper = new DeployHelper(config);

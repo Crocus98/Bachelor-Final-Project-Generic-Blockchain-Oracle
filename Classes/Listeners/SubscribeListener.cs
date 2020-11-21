@@ -1,6 +1,8 @@
 ﻿using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
+using Nethereum.RPC.NonceServices;
 using Nethereum.Web3;
+using Nethereum.Web3.Accounts;
 using Oracle888730.Contracts.Oracle888730.ContractDefinition;
 using Oracle888730.OracleEF;
 using Oracle888730.OracleEF.Models;
@@ -9,25 +11,23 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Oracle888730.Classes
+namespace Oracle888730.Classes.Listeners
 {
     class SubscribeListener : GenericListener
     {
-        public SubscribeListener(Web3 _web3, Config _config) : base(_web3, _config)
+        public SubscribeListener(Web3 _web3, Config _config, Account _account, InMemoryNonceService _inMemoryNonceService) : base(_web3, _config, _account, _inMemoryNonceService)
         {
             message = "[SubscribeListener]";
         }
 
         protected override async void Listener()
         {
-            /*
+            Event subscribeEvent = GetEvent("SubscribeEvent");
+            HexBigInteger latestBlock = RetrieveLatestBlockToRead(subscribeEvent);
+
             try
             {
-                
-                Event subscribeEvent = GetEvent("SubscribeEvent");
-                HexBigInteger latestBlock = RetrieveLatestBlockToRead(subscribeEvent);
                 StringWriter.Enqueue(message + " Listener started");
-                CurrencyChangesEnum currencyEnum = new CurrencyChangesEnum();
                 //INIZIO LOOP 
                 while (true)
                 {
@@ -39,22 +39,17 @@ namespace Oracle888730.Classes
                             string address = request.Event.Sender;
                             string serviceType = request.Event.SubscribeService;
                             int serviceTypeValue = (int)request.Event.SubscribeServiceType;
-                            var service = ModulesHelper.GetInstance(serviceType);
-                            if(service == null)
+                            ServiceType checkServiceType = OracleContext.GetRequestedType(serviceType, serviceTypeValue);
+                            if(checkServiceType == null)
                             {
                                 StringWriter.Enqueue(message + " Failed subscription for non existent service: " + serviceType + " from address: " + address);
                             }
                             else
                             {
-                                using (var db = new OracleContext())
-                                {
-                                    db.AddSubscriber(new Subscriber
-                                    {
-                                        Address = address,
-                                        Service = serviceType,
-                                        ServiceType = serviceTypeValue
-                                    });
-                                }
+                                Subscriber addSubscriber = new Subscriber();
+                                addSubscriber.Address = address;
+                                addSubscriber.ServiceTypeForeignKey = checkServiceType.ServiceTypeId;
+                                OracleContext.AddSubscriber(addSubscriber);
                                 StringWriter.Enqueue(message + " Successfull subscription for service: " + serviceType + " from address: " + address);
                             }
                         });
@@ -67,30 +62,11 @@ namespace Oracle888730.Classes
             }
             catch (Exception e)
             {
-                throw e;
+                StringWriter.Enqueue(message + "[ERROR] Exception stopped the request listener thread " + e.Message);
+                Listener();
             }
-            */
         }
 
-        private HexBigInteger RetrieveLatestBlockToRead(Event _subscribeEvent)
-        {
-            HexBigInteger latestBlock;
-            var filter = _subscribeEvent.CreateFilterAsync();
-            filter.Wait();
-            latestBlock = filter.Result;
-            /*if (config.Oracle.LatestBlock == null)
-            {
-                var filter = _subscribeEvent.CreateFilterAsync();
-                filter.Wait();
-                latestBlock = filter.Result;
-                config.Oracle.LatestBlock = latestBlock.HexValue;
-                config.Save();
-            }
-            else
-            {
-                latestBlock = new HexBigInteger(config.Oracle.LatestBlock);
-            }*/
-            return latestBlock;
-        }
+
     }
 }

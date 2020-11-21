@@ -1,5 +1,4 @@
 ﻿using Nethereum.Web3;
-using Nethereum.Model;
 using Nethereum.Web3.Accounts;
 using Oracle888730.Contracts.Oracle888730;
 using Oracle888730.Contracts.Oracle888730.ContractDefinition;
@@ -14,6 +13,8 @@ using System.Threading;
 using Oracle888730.Classes.Listeners;
 using Oracle888730.Classes.Handlers;
 using System.Reflection;
+using Nethereum.Web3.Accounts;
+using Nethereum.RPC.NonceServices;
 
 namespace Oracle888730.Utility
 {
@@ -24,6 +25,8 @@ namespace Oracle888730.Utility
         public static Oracle888730Service contractService;
         private Config config;
         private string listenersNameSpace;
+        private InMemoryNonceService inMemoryNonceService;
+        private Account account;
 
         public DeployHelper(Config _config) {
             config = _config;
@@ -47,11 +50,11 @@ namespace Oracle888730.Utility
         {
             List<Thread> threadList = new List<Thread>();
             List<Type> listeners = ModulesHelper.GetTypes(listenersNameSpace);
+            inMemoryNonceService = new InMemoryNonceService(config.RpcServer.PublicKey, web3.Client);
             listeners.ForEach(x =>
             {
-                GenericListener current = ModulesHelper.GetInstance<GenericListener>(x, new object[] {web3, config });
+                GenericListener current = ModulesHelper.GetInstance<GenericListener>(x, new object[] {web3, config, account, inMemoryNonceService });
                 threadList.Add(current.Start());
-                // GG <3
             });
             threadList.ForEach(x =>
             {
@@ -107,7 +110,7 @@ namespace Oracle888730.Utility
         {
             var url = _config.RpcServer.Url;
             var privateKey = _config.RpcServer.PrivateKey;
-            var account = new Nethereum.Web3.Accounts.Account(privateKey);
+            account = new Nethereum.Web3.Accounts.Account(privateKey);
             web3 = new Web3(account, url);
         }
 
