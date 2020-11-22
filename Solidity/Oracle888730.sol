@@ -12,8 +12,14 @@ contract Oracle888730 {
     address payable public oracleOwner;
     string public OracleName = "GenericOracle";
 
+    mapping (address => bool) private oracleSecondaryAddresses;
+
     constructor() {
         oracleOwner = msg.sender;
+    }
+
+    function AddOracleSecondaryAccount(address _newOracleSecondaryAccount) public onlyOracleOwner {
+        oracleSecondaryAddresses[_newOracleSecondaryAccount] = true;
     }
 
     event GenericPaymentEvent(
@@ -40,7 +46,7 @@ contract Oracle888730 {
     );
 
     modifier onlyOracleOwner() {
-        require ( msg.sender == oracleOwner, "You are not the owner of the oracle contract" );
+        require ( msg.sender == oracleOwner || oracleSecondaryAddresses[msg.sender] , "You are not the owner of the oracle contract" );
         _;
     }
 

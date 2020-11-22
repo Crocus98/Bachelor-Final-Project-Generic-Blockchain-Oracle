@@ -8,23 +8,26 @@ using Oracle888730.Utility;
 using System.Collections.Generic;
 using Nethereum.RPC.NonceServices;
 using Nethereum.Web3.Accounts;
+using System.Reflection;
+using Oracle888730.Classes.Handlers;
 
 namespace Oracle888730.Classes.Listeners
 {
     class RequestListener : GenericListener
     {
-        public RequestListener(Web3 _web3, Config _config, Account _account, InMemoryNonceService _inMemoryNonceService) : base(_web3, _config, _account, _inMemoryNonceService)
+        protected Dictionary<string, Type> handlers;
+        protected string handlersNameSpace;
+        public RequestListener(Web3 _web3, Config _config) : base(_web3, _config)
         {
             message = "[RequestListener]";
-
+            handlers = new Dictionary<string, Type>();
+            handlersNameSpace = "Classes.Handlers";
         }
 
         protected override async void Listener()
         {
             try
             {
-                ThreadPool.SetMinThreads(0 , 0);
-                ThreadPool.SetMaxThreads(2, 0);
                 Event requestEvent = GetEvent("RequestEvent");
                 HexBigInteger latestBlock = RetrieveLatestBlockToRead(requestEvent);
                 StringWriter.Enqueue(message + " Listener started");
@@ -34,7 +37,7 @@ namespace Oracle888730.Classes.Listeners
                     if (changes.Count > 0)
                     {
                         changes.ForEach(x => {
-                            string service = x.Event.RequestService.ToUpper();
+                            /*string service = x.Event.RequestService.ToUpper();
                             Type type;
                             if (handlers.ContainsKey(service))
                             {
@@ -47,9 +50,9 @@ namespace Oracle888730.Classes.Listeners
                             }
                             if (type != null)
                             {
-                                IGenericHandler currentType = ModulesHelper.GetInstance<IGenericHandler>(type, new object[] { web3, config, account, inMemoryNonceService, message });
-                                currentType.Start(x.Event);
-                            }
+                                EnqueueRequest(type,x.Event);
+                            }*/
+                            MainHandler.EnqueueEvent(x.Event);
                         });
                     }
                     else
@@ -64,6 +67,14 @@ namespace Oracle888730.Classes.Listeners
                 Listener();
             }
             
+        }
+
+        private static void EnqueueRequest(Type _type, RequestEventEventDTO _request)
+        {
+            MethodInfo staticMethodInfo = _type.GetMethod("Enqueue");
+            staticMethodInfo.Invoke(null, new object[] { _request });
+            //GenericHandler currentType = ModulesHelper.GetInstance<GenericHandler>(type, new object[] { web3, config, message});
+            //currentType.Enqueue(x.Event);
         }
 
     }

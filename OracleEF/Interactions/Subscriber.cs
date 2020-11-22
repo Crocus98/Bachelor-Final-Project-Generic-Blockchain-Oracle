@@ -22,7 +22,7 @@ namespace Oracle888730.OracleEF
             }
         }
 
-        public List<Subscriber> GetSubscribers(string _service = null, int? _serviceType = null)
+        public static List<Subscriber> GetSubscribers(string _service = null, int? _serviceType = null)
         {
             List<Subscriber> entities;
             using (var _context = new OracleContext())

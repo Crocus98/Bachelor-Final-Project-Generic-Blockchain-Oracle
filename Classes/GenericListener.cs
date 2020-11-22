@@ -19,20 +19,12 @@ namespace Oracle888730.Classes
         protected Config config;
         protected Oracle888730Service contractService;
         protected string message;
-        protected string handlersNameSpace;
-        protected Dictionary<string, Type> handlers;
-        protected Account account;
-        protected InMemoryNonceService inMemoryNonceService;
 
-        public GenericListener(Web3 _web3, Config _config, Account _account, InMemoryNonceService _inMemoryNonceService)
+        public GenericListener(Web3 _web3, Config _config)
         {
             this.web3 = _web3;
             this.config = _config;
             contractService = new Oracle888730Service(web3, config.Oracle.ContractAddress);
-            handlersNameSpace = "Classes.Handlers";
-            handlers = new Dictionary<string, Type>();
-            account = _account;
-            inMemoryNonceService = _inMemoryNonceService;
         }
 
         public Thread Start()
@@ -60,18 +52,6 @@ namespace Oracle888730.Classes
             filter.Wait();
             latestBlock = filter.Result;
             return latestBlock;
-            /*if (config.Oracle.LatestBlock == null)
-            {
-                var filter = _subscribeEvent.CreateFilterAsync();
-                filter.Wait();
-                latestBlock = filter.Result;
-                config.Oracle.LatestBlock = latestBlock.HexValue;
-                config.Save();
-            }
-            else
-            {
-                latestBlock = new HexBigInteger(config.Oracle.LatestBlock);
-            }*/
         }
 
         protected abstract void Listener();

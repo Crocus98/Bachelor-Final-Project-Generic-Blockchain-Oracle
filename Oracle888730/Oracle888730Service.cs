@@ -42,6 +42,32 @@ namespace Oracle888730.Contracts.Oracle888730
             ContractHandler = web3.Eth.GetContractHandler(contractAddress);
         }
 
+        public Task<string> AddOracleSecondaryAccountRequestAsync(AddOracleSecondaryAccountFunction addOracleSecondaryAccountFunction)
+        {
+             return ContractHandler.SendRequestAsync(addOracleSecondaryAccountFunction);
+        }
+
+        public Task<TransactionReceipt> AddOracleSecondaryAccountRequestAndWaitForReceiptAsync(AddOracleSecondaryAccountFunction addOracleSecondaryAccountFunction, CancellationTokenSource cancellationToken = null)
+        {
+             return ContractHandler.SendRequestAndWaitForReceiptAsync(addOracleSecondaryAccountFunction, cancellationToken);
+        }
+
+        public Task<string> AddOracleSecondaryAccountRequestAsync(string newOracleSecondaryAccount)
+        {
+            var addOracleSecondaryAccountFunction = new AddOracleSecondaryAccountFunction();
+                addOracleSecondaryAccountFunction.NewOracleSecondaryAccount = newOracleSecondaryAccount;
+            
+             return ContractHandler.SendRequestAsync(addOracleSecondaryAccountFunction);
+        }
+
+        public Task<TransactionReceipt> AddOracleSecondaryAccountRequestAndWaitForReceiptAsync(string newOracleSecondaryAccount, CancellationTokenSource cancellationToken = null)
+        {
+            var addOracleSecondaryAccountFunction = new AddOracleSecondaryAccountFunction();
+                addOracleSecondaryAccountFunction.NewOracleSecondaryAccount = newOracleSecondaryAccount;
+            
+             return ContractHandler.SendRequestAndWaitForReceiptAsync(addOracleSecondaryAccountFunction, cancellationToken);
+        }
+
         public Task<string> GetRequestRequestAsync(GetRequestFunction getRequestFunction)
         {
              return ContractHandler.SendRequestAsync(getRequestFunction);

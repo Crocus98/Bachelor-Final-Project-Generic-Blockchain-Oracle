@@ -9,14 +9,15 @@ using System.Threading;
 
 namespace Oracle888730.Utility
 {
-    class GenericAPIHelper
+    abstract class GenericAPIHelper
     {
-        public string nameSpace;
+        protected string nameSpace;
+        protected string message;
         public GenericAPIHelper()
         {
             nameSpace = "Utility.ApiHelpers";
         }
 
-
+        public abstract string GetWantedValue(string _wantedChange);
     }
 }

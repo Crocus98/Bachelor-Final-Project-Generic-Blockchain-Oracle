@@ -15,7 +15,7 @@ namespace Oracle888730.Classes.Listeners
 {
     class SubscribeListener : GenericListener
     {
-        public SubscribeListener(Web3 _web3, Config _config, Account _account, InMemoryNonceService _inMemoryNonceService) : base(_web3, _config, _account, _inMemoryNonceService)
+        public SubscribeListener(Web3 _web3, Config _config) : base(_web3, _config)
         {
             message = "[SubscribeListener]";
         }
@@ -46,10 +46,7 @@ namespace Oracle888730.Classes.Listeners
                             }
                             else
                             {
-                                Subscriber addSubscriber = new Subscriber();
-                                addSubscriber.Address = address;
-                                addSubscriber.ServiceTypeForeignKey = checkServiceType.ServiceTypeId;
-                                OracleContext.AddSubscriber(addSubscriber);
+                                OracleContext.AddSubscriber(CreateSubscriber(address, checkServiceType.ServiceTypeId));
                                 StringWriter.Enqueue(message + " Successfull subscription for service: " + serviceType + " from address: " + address);
                             }
                         });
@@ -67,6 +64,12 @@ namespace Oracle888730.Classes.Listeners
             }
         }
 
-
+        private Subscriber CreateSubscriber(string _address, int _serviceTypeId)
+        {
+            Subscriber addSubscriber = new Subscriber();
+            addSubscriber.Address = _address;
+            addSubscriber.ServiceTypeForeignKey = _serviceTypeId;
+            return addSubscriber;
+        }
     }
 }

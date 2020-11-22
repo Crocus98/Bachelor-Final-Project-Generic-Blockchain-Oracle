@@ -15,7 +15,7 @@ namespace Oracle888730.Utility
             moduleList.ForEach(x => Console.WriteLine(x.Name));
         */
         private static string assemblyName = "Oracle88730.";
-        public static Type  GetType(string _serviceName, string _nameSpace)
+        public static Type GetType(string _serviceName, string _nameSpace)
         {
             var r = Assembly
                 .GetExecutingAssembly()
@@ -42,9 +42,9 @@ namespace Oracle888730.Utility
         }
 
 
-        public static T GetInstance<T>(Type _type, object[] _p = null)
+        public static T GetInstance<T>(Type _type, object[] _parameters = null)
         {
-            return Activator.CreateInstance(_type, _p) as dynamic;
+            return Activator.CreateInstance(_type, _parameters) as dynamic;
         }
     }
 }

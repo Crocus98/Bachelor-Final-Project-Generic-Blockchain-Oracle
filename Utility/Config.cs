@@ -33,10 +33,10 @@ namespace Oracle888730.Utility
             Config c = new Config();
             if (!File.Exists(fileName))
             {
-                Console.WriteLine("[WARNING]Missing config.json file...");
+                Console.WriteLine("[WARNING] Missing config.json file...");
                 jsonString = JsonSerializer.Serialize<Config>(c);
                 File.WriteAllText(fileName, jsonString);
-                Console.WriteLine("[WARNING]File template created. Fill it with your setup settings.");
+                Console.WriteLine("[WARNING] File template created. Fill it with your setup settings.");
                 Exit();
                 return c;
             }
@@ -49,7 +49,7 @@ namespace Oracle888730.Utility
             }
             catch
             {
-                Console.WriteLine("[ERR]Couldn't convert config.json file...");
+                Console.WriteLine("[ERROR] Couldn't convert config.json file...");
                 Exit();
                 return c;
             }
@@ -86,6 +86,9 @@ namespace Oracle888730.Utility
 
         [JsonPropertyName("publicKey")]
         public string PublicKey { get; set; }
+
+        [JsonPropertyName("secondaryAdresses")]
+        public IList<IList<string>> SecondaryAddresses { get; set; }
     }
 
     public class Oracle

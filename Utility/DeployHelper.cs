@@ -110,7 +110,7 @@ namespace Oracle888730.Utility
         {
             var url = _config.RpcServer.Url;
             var privateKey = _config.RpcServer.PrivateKey;
-            account = new Nethereum.Web3.Accounts.Account(privateKey);
+            account = new Account(privateKey);
             web3 = new Web3(account, url);
         }
 
