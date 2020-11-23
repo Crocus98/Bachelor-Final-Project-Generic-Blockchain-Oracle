@@ -15,15 +15,10 @@ namespace Oracle888730.Classes
 {
     class SubscribersEnqueuer : IGeneric
     {
-        private string message;
-        protected Dictionary<string, Type> handlers;
-        private string handlersNameSpace;
-        
+        private readonly string message = "[SubscribeEnqueuer]";
+
         public SubscribersEnqueuer()
         {
-            message = "[SubscribeEnqueuer]";
-            handlers = new Dictionary<string, Type>();
-            handlersNameSpace = "Classes.Handlers";
         }
         public Thread Start()
         {
@@ -48,33 +43,19 @@ namespace Oracle888730.Classes
                     {
                         subscribers.ForEach(x =>
                         {
-                        /*
-                        string service = x.ServiceType.Service.ServiceName.ToUpper();
-                        Type type;
-                        if (handlers.ContainsKey(service))
-                        {
-                            type = handlers.GetValueOrDefault(service);
-                        }
-                        else
-                        {
-                            type = ModulesHelper.GetType(service, handlersNameSpace);
-                            handlers.Add(service, type);
-                        }
-                        if (type != null)
-                        {
-                            EnqueueSubscriberRequest(type, x);
-                        }*/
-                            RequestEventEventDTO requestEvent = new RequestEventEventDTO();
-                            requestEvent.Sender = x.Address;
-                            requestEvent.RequestService = x.ServiceType.Service.ServiceName;
-                            requestEvent.RequestServiceType = x.ServiceTypeForeignKey;
+                            RequestEventEventDTO requestEvent = new RequestEventEventDTO
+                            {
+                                Sender = x.Address,
+                                RequestService = x.ServiceType.Service.ServiceName,
+                                RequestServiceType = x.ServiceTypeForeignKey
+                            };
                             MainHandler.EnqueueEvent(requestEvent);
                         });
                         object temp = new object();
                         timer.Stop();
                         lock (temp)
                         {
-                            Monitor.Wait(temp, 3600000 - (int)timer.Elapsed.TotalMilliseconds);
+                            Monitor.Wait(temp, 300000 - (int)timer.Elapsed.TotalMilliseconds);
                         }
                     }
                     else

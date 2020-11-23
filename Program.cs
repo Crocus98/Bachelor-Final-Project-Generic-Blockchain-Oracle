@@ -9,20 +9,16 @@ namespace Oracle888730
     class Program
     {
         public static Config config;
-        public static OracleContext db;
-        static void Main(string[] args)
+        static void Main()
         {
+            Console.WriteLine("[PROGRAM] Oracle888730 starting...");
+            StringWriter stringWriter = new StringWriter();
+            SetupDb();
             config = Config.Load();
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomainProcessExit);
-            SetupDb();
-            StringWriter sw = new StringWriter();
             DeployHelper deployHelper = new DeployHelper(config);
             deployHelper.ConnectOrDeploy();
-            try {
-                deployHelper.StartListener();
-            }
-            catch(Exception e) { Console.WriteLine(e.Message); }
-            
+            deployHelper.StartOracle();
         }
 
         static void CurrentDomainProcessExit(object sender, EventArgs e)
@@ -34,12 +30,12 @@ namespace Oracle888730
         {
             try
             {
-                db = new OracleContext();
+                OracleContext db = new OracleContext();
                 db.Database.EnsureCreated();
             }
             catch
             {
-                Console.WriteLine("[ERROR] Impossible starting database...");
+                Console.WriteLine("[PROGRAM][ERROR] Impossible starting database...");
                 Config.Exit();
             }
         }

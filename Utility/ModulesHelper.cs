@@ -9,12 +9,6 @@ namespace Oracle888730.Utility
 {
     class ModulesHelper
     {
-        /**
-         * string moduleNamespace = "StategyPattern.Modules";
-            var moduleList = Assembly.GetExecutingAssembly().GetTypes().Where(x => x.IsClass && x.Namespace == moduleNamespace).ToList();
-            moduleList.ForEach(x => Console.WriteLine(x.Name));
-        */
-        private static string assemblyName = "Oracle88730.";
         public static Type GetType(string _serviceName, string _nameSpace)
         {
             var r = Assembly

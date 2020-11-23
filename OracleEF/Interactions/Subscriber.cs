@@ -17,8 +17,15 @@ namespace Oracle888730.OracleEF
         {
             using (var _context = new OracleContext())
             {
-                _context.Subscribers.Add(_subscriber);
-                return _context.SaveChanges() > 0;
+                if(_context.Subscribers.Where(x =>
+                        x.Address == _subscriber.Address &&
+                        x.ServiceTypeForeignKey == _subscriber.ServiceTypeForeignKey
+                    ).ToList().Count == 0)
+                {
+                    _context.Subscribers.Add(_subscriber);
+                    return _context.SaveChanges() > 0;
+                }
+                return false;
             }
         }
 

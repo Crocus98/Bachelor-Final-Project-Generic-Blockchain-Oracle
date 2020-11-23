@@ -33,21 +33,6 @@ namespace Oracle888730.Classes.Listeners
                     if (changes.Count > 0)
                     {
                         changes.ForEach(x => {
-                            /*string service = x.Event.RequestService.ToUpper();
-                            Type type;
-                            if (handlers.ContainsKey(service))
-                            {
-                                type = handlers.GetValueOrDefault(service);
-                            }
-                            else
-                            {
-                                type = ModulesHelper.GetType(service, handlersNameSpace);
-                                handlers.Add(service,type);
-                            }
-                            if (type != null)
-                            {
-                                EnqueueRequest(type,x.Event);
-                            }*/
                             MainHandler.EnqueueEvent(x.Event);
                         });
                     }
@@ -64,13 +49,6 @@ namespace Oracle888730.Classes.Listeners
             }
             
         }
-
-        private static void EnqueueRequest(Type _type, RequestEventEventDTO _request)
-        {
-            MethodInfo staticMethodInfo = _type.GetMethod("Enqueue");
-            staticMethodInfo.Invoke(null, new object[] { _request });
-        }
-
     }
 
 }

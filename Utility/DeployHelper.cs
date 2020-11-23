@@ -25,17 +25,16 @@ namespace Oracle888730.Utility
         public static Web3 web3;
         public static Oracle888730Service contractService;
         private Config config;
-        private List<string> nameSpaces;
+        private readonly List<string> nameSpaces = new List<string>{
+                "Classes.Listeners",
+                "Classes.Handlers"
+            };
         private Account account;
-        private string message;
+        private readonly string message = "[DeployHelper]";
 
         public DeployHelper(Config _config) {
             config = _config;
-            nameSpaces = new List<string>();
-            nameSpaces.Add("Classes.Listeners");
-            nameSpaces.Add("Classes.Handlers");
-            message = "[DeployHelper]";
-        } 
+        }
 
         public void ConnectOrDeploy() {
             var contractAddress = config.Oracle.ContractAddress;
@@ -50,21 +49,33 @@ namespace Oracle888730.Utility
 
         }
 
-        public void StartListener()
+        public void StartOracle()
         {
             List<Thread> threadList = new List<Thread>();
-            nameSpaces.ForEach(x => {
-                List<Type> types = ModulesHelper.GetTypes(x);
-                types.ForEach(z => {
-                    dynamic current = ModulesHelper.GetInstance<dynamic>(z, new object[] {web3, config});
-                    threadList.Add(((IGeneric)current).Start());
-                    current = null;
-                });
-            });
-            threadList.Add(new SubscribersEnqueuer().Start());
+            StartListenersAndHandler(threadList);
+            StartSubscriber(threadList);
             threadList.ForEach(x =>
             {
                 x.Join();
+            });
+        }
+
+        private void StartSubscriber(List<Thread> threadList)
+        {
+            threadList.Add(new SubscribersEnqueuer().Start());
+        }
+
+        private void StartListenersAndHandler(List<Thread> threadList)
+        {
+            nameSpaces.ForEach(x => {
+                List<Type> types = ModulesHelper.GetTypes(x);
+                types.ForEach(z => {
+                    dynamic current = ModulesHelper.GetInstance<dynamic>(z, new object[] { web3, config });
+                    threadList.Add(
+                        ((IGeneric)current).Start()
+                        );
+                    current = null;
+                });
             });
         }
 
@@ -75,15 +86,15 @@ namespace Oracle888730.Utility
                 SetAbi(_config);
                 SetWeb3(_config);
                 var oracle888730Deployment = new Oracle888730Deployment();
-                Console.WriteLine("[PROGRAM] Deploying the smart contract on blockchain..."); 
+                StringWriter.Enqueue(message + "[PROGRAM] Deploying the smart contract on blockchain..."); 
                 var transactionReceiptDeployment = await web3.Eth.GetContractDeploymentHandler<Oracle888730Deployment>().SendRequestAndWaitForReceiptAsync(oracle888730Deployment);
                 var contractAddress = transactionReceiptDeployment.ContractAddress;
                 _config.Oracle.ContractAddress = contractAddress;
                 _config.Save();
-                Console.WriteLine("[PROGRAM] Creating contract service...");
+                StringWriter.Enqueue(message + "[PROGRAM] Creating contract service...");
                 contractService = new Oracle888730Service(web3, contractAddress);
                 var contractName = await contractService.OracleNameQueryAsync();
-                Console.WriteLine("[PROGRAM] Contract " + contractName + " created at address: " + contractAddress);
+                StringWriter.Enqueue(message + "[PROGRAM] Contract " + contractName + " created at address: " + contractAddress);
                 if (config.RpcServer.SecondaryAddresses != null)
                 {
                     config.RpcServer.SecondaryAddresses.ToList().ForEach(x =>
@@ -92,24 +103,26 @@ namespace Oracle888730.Utility
                         receipt.Wait();
                         if(receipt.Result.Status.Value == 0)
                         {
-                            throw new Exception("Config.e");
+                            //TODO Msg
+                            StringWriter.Enqueue(message + "[ERR]");
+                            Config.Exit();
                         }
                         else
                         {
-                            Console.WriteLine("[PROGRAM] Oracle secondary address added to new contract.");
+                            StringWriter.Enqueue(message + "[PROGRAM] Oracle secondary address added to new contract.");
                         }
                     });
                 }
                 else
                 {
-                    Console.WriteLine("[PROGRAM] No secondary Addresses");
+                    StringWriter.Enqueue(message + "[PROGRAM] No secondary Addresses");
                 }
                 
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine("[ERR] Couldn't deploy the contract.");
-                Console.WriteLine("[ADVISE] Check that ur RPC client is running.");
+                StringWriter.Enqueue(message + "[ERR] Couldn't deploy the contract.");
+                StringWriter.Enqueue(message + "[ADVISE] Check that ur RPC client is running.");
                 Config.Exit();
             }
         }
@@ -121,15 +134,15 @@ namespace Oracle888730.Utility
                 SetAbi(_config);
                 SetWeb3(_config);
                 var contractAddress = _config.Oracle.ContractAddress;
-                Console.WriteLine("[PROGRAM] Creating contract service...");
+                StringWriter.Enqueue(message + " Creating contract service...");
                 contractService = new Oracle888730Service(web3, contractAddress);
                 var contractName = await contractService.OracleNameQueryAsync();
-                Console.WriteLine("[PROGRAM] Connecting to contract " + contractName + " with address: " + contractAddress);
+                StringWriter.Enqueue(message + " Connecting to contract " + contractName + " with address: " + contractAddress);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine("[ERR] Couldn't connect to contract.");
-                Console.WriteLine("[ADVISE] Check that ur RPC client is running and check \nthat the contract address in your config.json file is correct. ");
+                StringWriter.Enqueue(message + "[ERR] Couldn't connect to contract.");
+                StringWriter.Enqueue(message + "[ADVISE] Check that ur RPC client is running and check \nthat the contract address in your config.json file is correct. ");
                 Config.Exit();
             }
         }
@@ -138,6 +151,7 @@ namespace Oracle888730.Utility
             var url = _config.RpcServer.Url;
             var privateKey = _config.RpcServer.PrivateKey;
             account = new Account(privateKey);
+            // TODO Try
             web3 = new Web3(account, url);
         }
 
@@ -145,11 +159,17 @@ namespace Oracle888730.Utility
         {
             if (_config.Oracle.Abi == null || _config.Oracle.Abi == "")
             {
-                string path = Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString()) + @"\bin\Solidity\Oracle888730.abi";
+                string path = Directory.GetParent(
+                    Directory.GetParent(
+                        Directory.GetParent(
+                            Directory.GetCurrentDirectory()
+                            ).ToString()
+                        ).ToString()
+                    ) + @"\bin\Solidity\Oracle888730.abi";
                 if (!File.Exists(path))
                 {
-                    Console.WriteLine("[ERR] Missing Abi file");
-                    Console.WriteLine("[ADVISE] Compile your Solidity contract before continuing.");
+                    StringWriter.Enqueue(message + "[ERR] Missing Abi file");
+                    StringWriter.Enqueue(message + "[ADVISE] Compile your Solidity contract before continuing.");
                     Config.Exit();
                 }
                 _config.Oracle.Abi = File.ReadAllText(path);

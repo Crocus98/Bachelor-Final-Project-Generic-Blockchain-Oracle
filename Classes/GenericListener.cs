@@ -22,8 +22,8 @@ namespace Oracle888730.Classes
 
         public GenericListener(Web3 _web3, Config _config)
         {
-            this.web3 = _web3;
-            this.config = _config;
+            web3 = _web3;
+            config = _config;
             contractService = new Oracle888730Service(web3, config.Oracle.ContractAddress);
         }
 

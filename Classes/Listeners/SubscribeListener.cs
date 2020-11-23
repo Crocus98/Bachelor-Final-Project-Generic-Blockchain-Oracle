@@ -46,7 +46,9 @@ namespace Oracle888730.Classes.Listeners
                             }
                             else
                             {
-                                OracleContext.AddSubscriber(CreateSubscriber(address, checkServiceType.ServiceTypeId));
+                                OracleContext.AddSubscriber(
+                                    CreateSubscriber(address, checkServiceType.ServiceTypeId)
+                                );
                                 StringWriter.Enqueue(message + " Successfull subscription for service: " + serviceType + " from address: " + address);
                             }
                         });
@@ -59,17 +61,18 @@ namespace Oracle888730.Classes.Listeners
             }
             catch (Exception e)
             {
-                StringWriter.Enqueue(message + "[ERROR] Exception stopped the request listener thread " + e.Message);
+                StringWriter.Enqueue(message + "[ERROR] Exception stopped the request listener thread: " + e.Message);
                 Listener();
             }
         }
 
         private Subscriber CreateSubscriber(string _address, int _serviceTypeId)
         {
-            Subscriber addSubscriber = new Subscriber();
-            addSubscriber.Address = _address;
-            addSubscriber.ServiceTypeForeignKey = _serviceTypeId;
-            return addSubscriber;
+            return new Subscriber
+            {
+                Address = _address,
+                ServiceTypeForeignKey = _serviceTypeId
+            };
         }
     }
 }

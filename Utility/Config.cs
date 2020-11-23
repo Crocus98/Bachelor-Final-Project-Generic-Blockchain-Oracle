@@ -10,7 +10,8 @@ namespace Oracle888730.Utility
 {
     public class Config
     {
-        private static string fileName = Directory.GetCurrentDirectory() + "\\config.json";
+        private static readonly string fileName = Directory.GetCurrentDirectory() + "\\config.json";
+        private static readonly string message = "[CONFIG]";
 
         [JsonPropertyName("rpc_server")]
         public RpcServer RpcServer { get; set; }
