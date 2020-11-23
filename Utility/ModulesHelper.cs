@@ -38,7 +38,8 @@ namespace Oracle888730.Utility
 
         public static T GetInstance<T>(Type _type, object[] _parameters = null)
         {
-            return Activator.CreateInstance(_type, _parameters) as dynamic;
+            return Activator
+                .CreateInstance(_type, _parameters) as dynamic;
         }
     }
 }

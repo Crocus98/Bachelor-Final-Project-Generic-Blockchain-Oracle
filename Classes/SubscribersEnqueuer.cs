@@ -17,9 +17,7 @@ namespace Oracle888730.Classes
     {
         private readonly string message = "[SubscribeEnqueuer]";
 
-        public SubscribersEnqueuer()
-        {
-        }
+        public SubscribersEnqueuer() { }
         public Thread Start()
         {
             Thread threadListener = new Thread(Enqueuer);
@@ -32,7 +30,7 @@ namespace Oracle888730.Classes
             try
             {
                 StringWriter.Enqueue(message + " Subscriber enqueuer setup started...");
-                Thread.Sleep(2000);
+                Thread.Sleep(3000);
                 Stopwatch timer = new Stopwatch();
                 StringWriter.Enqueue(message + " Subscriber enqueuer started");
                 while (true)
@@ -41,27 +39,13 @@ namespace Oracle888730.Classes
                     List<Subscriber> subscribers = OracleContext.GetSubscribers();
                     if (subscribers != null && subscribers.Count > 0)
                     {
-                        subscribers.ForEach(x =>
-                        {
-                            RequestEventEventDTO requestEvent = new RequestEventEventDTO
-                            {
-                                Sender = x.Address,
-                                RequestService = x.ServiceType.Service.ServiceName,
-                                RequestServiceType = x.ServiceTypeForeignKey
-                            };
-                            MainHandler.EnqueueEvent(requestEvent);
-                        });
-                        object temp = new object();
-                        timer.Stop();
-                        lock (temp)
-                        {
-                            Monitor.Wait(temp, 300000 - (int)timer.Elapsed.TotalMilliseconds);
-                        }
+                        EnqueueEvents(subscribers);
+                        WaitTime(timer);
                     }
                     else
                     {
                         timer.Stop();
-                        Thread.Sleep(1000);
+                        Thread.Sleep(500);
                     }
                     timer.Reset();
                 }
@@ -70,6 +54,30 @@ namespace Oracle888730.Classes
             {
                 StringWriter.Enqueue(message + "[ERROR] " + e.Message);
                 Enqueuer();
+            }
+        }
+
+        private void EnqueueEvents(List<Subscriber> _subscribers)
+        {
+            _subscribers.ForEach(x =>
+            {
+                RequestEventEventDTO requestEvent = new RequestEventEventDTO
+                {
+                    Sender = x.Address,
+                    RequestService = x.ServiceType.Service.ServiceName,
+                    RequestServiceType = x.ServiceTypeForeignKey
+                };
+                MainHandler.EnqueueEvent(requestEvent);
+            });
+        }
+
+        private void WaitTime(Stopwatch _stopWatch)
+        {
+            object temp = new object();
+            _stopWatch.Stop();
+            lock (temp)
+            {
+                Monitor.Wait(temp, 300000 - (int)_stopWatch.Elapsed.TotalMilliseconds);
             }
         }
     }

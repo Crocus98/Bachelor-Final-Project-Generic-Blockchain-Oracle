@@ -31,7 +31,7 @@ namespace Oracle888730.Classes
         {
             Thread threadListener = new Thread(Listener);
             threadListener.Start();
-            return threadListener;  
+            return threadListener;
         }
 
         protected Event GetEvent(string _eventName)

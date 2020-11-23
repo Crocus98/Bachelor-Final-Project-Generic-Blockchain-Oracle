@@ -38,13 +38,13 @@ namespace Oracle888730.Classes.Listeners
                     }
                     else
                     {
-                        Thread.Sleep(100);
+                        Thread.Sleep(500);
                     }
                 }
             }
             catch (Exception e)
             {
-                StringWriter.Enqueue(message + "[ERROR] Exception stopped the request listener thread " + e.Message );
+                StringWriter.Enqueue(message + "[ERROR] Exception stopped the listener thread " + e.Message );
                 Listener();
             }
             

@@ -30,35 +30,38 @@ namespace Oracle888730.Utility
         }
         public static Config Load()
         {
-            string jsonString;
-            Config c = new Config();
-            if (!File.Exists(fileName))
-            {
-                Console.WriteLine("[WARNING] Missing config.json file...");
-                jsonString = JsonSerializer.Serialize<Config>(c);
-                File.WriteAllText(fileName, jsonString);
-                Console.WriteLine("[WARNING] File template created. Fill it with your setup settings.");
-                Exit();
-                return c;
-            }
-            Console.WriteLine("[PROGRAM] Retrieving config datas...");
-            jsonString = File.ReadAllText(fileName);
+            CheckExist();
+            Config config = new Config();
+            StringWriter.Enqueue(message + " Retrieving config datas...");
+            string jsonString = File.ReadAllText(fileName);
             try
             {
-                c = JsonSerializer.Deserialize<Config>(jsonString);
-                return c;
+                config = JsonSerializer.Deserialize<Config>(jsonString);
             }
             catch
             {
-                Console.WriteLine("[ERROR] Couldn't convert config.json file...");
+                StringWriter.Enqueue(message + "[ERROR] Couldn't convert config.json file...");
                 Exit();
-                return c;
+                
+            }
+            return config;
+        }
+
+        private static void CheckExist()
+        {
+            if (!File.Exists(fileName))
+            {
+                StringWriter.Enqueue(message + "[ERROR] Missing config.json file...");
+                string jsonString = JsonSerializer.Serialize<Config>(new Config());
+                File.WriteAllText(fileName, jsonString);
+                StringWriter.Enqueue(message + "[WARNING] File template created. Fill it with your setup settings.");
+                Exit();
             }
         }
 
         public static void Exit()
         {
-            Console.WriteLine("[PROGRAM] Press any key to exit.");
+            StringWriter.Enqueue(message + " Press any key to exit.");
             Console.ReadLine();
             Environment.Exit(0);
         }
@@ -67,16 +70,17 @@ namespace Oracle888730.Utility
         {
             try
             {
-                string jsonString = JsonSerializer.Serialize<Config>(this);
+                string jsonString = JsonSerializer.Serialize(this);
                 File.WriteAllText(fileName, jsonString);
             }
             catch 
             {
-                Console.WriteLine("[ERROR] Impossible to save config datas.");
+                StringWriter.Enqueue(message + "[ERROR] Impossible to save config datas.");
                 Exit();
             }
         }
     }
+
     public class RpcServer
     {
         [JsonPropertyName("url")]

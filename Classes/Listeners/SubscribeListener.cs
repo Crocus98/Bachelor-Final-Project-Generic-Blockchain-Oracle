@@ -24,33 +24,16 @@ namespace Oracle888730.Classes.Listeners
         {
             Event subscribeEvent = GetEvent("SubscribeEvent");
             HexBigInteger latestBlock = RetrieveLatestBlockToRead(subscribeEvent);
-            
             try
             {
-                StringWriter.Enqueue(message + " Listener started");
-                //INIZIO LOOP 
+                StringWriter.Enqueue(message + " Listener started"); 
                 while (true)
                 {
                     var changes = await subscribeEvent.GetFilterChanges<SubscribeEventEventDTO>(latestBlock);
                     if (changes.Count > 0)
                     {
-                        changes.ForEach(request =>
-                        {
-                            string address = request.Event.Sender;
-                            string serviceType = request.Event.SubscribeService;
-                            int serviceTypeValue = (int)request.Event.SubscribeServiceType;
-                            ServiceType checkServiceType = OracleContext.GetRequestedType(serviceType, serviceTypeValue);
-                            if(checkServiceType == null)
-                            {
-                                StringWriter.Enqueue(message + " Failed subscription for non existent service: " + serviceType + " from address: " + address);
-                            }
-                            else
-                            {
-                                OracleContext.AddSubscriber(
-                                    CreateSubscriber(address, checkServiceType.ServiceTypeId)
-                                );
-                                StringWriter.Enqueue(message + " Successfull subscription for service: " + serviceType + " from address: " + address);
-                            }
+                        changes.ForEach(request => {
+                            AddSubscriber(request);
                         });
                     }
                     else
@@ -61,8 +44,33 @@ namespace Oracle888730.Classes.Listeners
             }
             catch (Exception e)
             {
-                StringWriter.Enqueue(message + "[ERROR] Exception stopped the request listener thread: " + e.Message);
+                StringWriter.Enqueue(message + "[ERROR] Exception stopped the listener thread: " + e.Message);
                 Listener();
+            }
+        }
+
+        private void AddSubscriber(EventLog<SubscribeEventEventDTO> _request) {
+            string address = _request.Event.Sender;
+            string serviceType = _request.Event.SubscribeService;
+            int serviceTypeValue = (int)_request.Event.SubscribeServiceType;
+            ServiceType checkServiceType = OracleContext.GetRequestedType(serviceType, serviceTypeValue);
+            if (checkServiceType == null)
+            {
+                StringWriter.Enqueue(message + "[WARNING] Failed subscription for non existent service: " + serviceType + " from address: " + address);
+            }
+            else
+            {
+                bool result = OracleContext.AddSubscriber(
+                    CreateSubscriber(address, checkServiceType.ServiceTypeId)
+                );
+                if (result)
+                {
+                    StringWriter.Enqueue(message + " Successfull subscription for service: " + serviceType + " from address: " + address);
+                }
+                else
+                {
+                    StringWriter.Enqueue(message + "[WARNING] User already subscribed for service: " + serviceType + " from address: " + address);
+                }
             }
         }
 
