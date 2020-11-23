@@ -15,13 +15,9 @@ namespace Oracle888730.Classes.Listeners
 {
     class RequestListener : GenericListener
     {
-        protected Dictionary<string, Type> handlers;
-        protected string handlersNameSpace;
         public RequestListener(Web3 _web3, Config _config) : base(_web3, _config)
         {
             message = "[RequestListener]";
-            handlers = new Dictionary<string, Type>();
-            handlersNameSpace = "Classes.Handlers";
         }
 
         protected override async void Listener()
@@ -73,8 +69,6 @@ namespace Oracle888730.Classes.Listeners
         {
             MethodInfo staticMethodInfo = _type.GetMethod("Enqueue");
             staticMethodInfo.Invoke(null, new object[] { _request });
-            //GenericHandler currentType = ModulesHelper.GetInstance<GenericHandler>(type, new object[] { web3, config, message});
-            //currentType.Enqueue(x.Event);
         }
 
     }

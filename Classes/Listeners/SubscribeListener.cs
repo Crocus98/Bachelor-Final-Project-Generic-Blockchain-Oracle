@@ -24,7 +24,7 @@ namespace Oracle888730.Classes.Listeners
         {
             Event subscribeEvent = GetEvent("SubscribeEvent");
             HexBigInteger latestBlock = RetrieveLatestBlockToRead(subscribeEvent);
-
+            
             try
             {
                 StringWriter.Enqueue(message + " Listener started");

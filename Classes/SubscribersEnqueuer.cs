@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace Oracle888730.Classes
 {
-    class SubscribersEnqueuer : IGenericListener
+    class SubscribersEnqueuer : IGeneric
     {
         private string message;
         protected Dictionary<string, Type> handlers;
@@ -36,14 +36,18 @@ namespace Oracle888730.Classes
         {
             try
             {
+                StringWriter.Enqueue(message + " Subscriber enqueuer setup started...");
                 Thread.Sleep(2000);
                 Stopwatch timer = new Stopwatch();
+                StringWriter.Enqueue(message + " Subscriber enqueuer started");
                 while (true)
                 {
                     timer.Start();
                     List<Subscriber> subscribers = OracleContext.GetSubscribers();
-                    subscribers.ForEach(x =>
+                    if (subscribers != null && subscribers.Count > 0)
                     {
+                        subscribers.ForEach(x =>
+                        {
                         /*
                         string service = x.ServiceType.Service.ServiceName.ToUpper();
                         Type type;
@@ -60,17 +64,23 @@ namespace Oracle888730.Classes
                         {
                             EnqueueSubscriberRequest(type, x);
                         }*/
-                        RequestEventEventDTO requestEvent = new RequestEventEventDTO();
-                        requestEvent.Sender = x.Address;
-                        requestEvent.RequestService = x.ServiceType.Service.ServiceName;
-                        requestEvent.RequestServiceType = x.ServiceTypeForeignKey;
-                        MainHandler.EnqueueEvent(requestEvent);
-                    });
-                    object temp = new object();
-                    timer.Stop();
-                    lock (temp)
+                            RequestEventEventDTO requestEvent = new RequestEventEventDTO();
+                            requestEvent.Sender = x.Address;
+                            requestEvent.RequestService = x.ServiceType.Service.ServiceName;
+                            requestEvent.RequestServiceType = x.ServiceTypeForeignKey;
+                            MainHandler.EnqueueEvent(requestEvent);
+                        });
+                        object temp = new object();
+                        timer.Stop();
+                        lock (temp)
+                        {
+                            Monitor.Wait(temp, 3600000 - (int)timer.Elapsed.TotalMilliseconds);
+                        }
+                    }
+                    else
                     {
-                        Monitor.Wait(temp, 3600000 - (int)timer.Elapsed.TotalMilliseconds);
+                        timer.Stop();
+                        Thread.Sleep(1000);
                     }
                     timer.Reset();
                 }
@@ -81,17 +91,5 @@ namespace Oracle888730.Classes
                 Enqueuer();
             }
         }
-
-       /* private static void EnqueueSubscriberRequest(Type _type, Subscriber _request)
-        {
-            RequestEventEventDTO requestEvent = new RequestEventEventDTO();
-            requestEvent.Sender = _request.Address;
-            requestEvent.RequestService = _request.ServiceType.Service.ServiceName;
-            requestEvent.RequestServiceType = _request.ServiceTypeForeignKey;
-            //MethodInfo staticMethodInfo = _type.GetMethod("Enqueue");
-            //staticMethodInfo.Invoke(null, new object[] { _request });
-            //GenericHandler currentType = ModulesHelper.GetInstance<GenericHandler>(type, new object[] { web3, config, message});
-            //currentType.Enqueue(x.Event);
-        }*/
     }
 }

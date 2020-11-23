@@ -13,8 +13,9 @@ using System.Threading;
 using Oracle888730.Classes.Listeners;
 using Oracle888730.Classes.Handlers;
 using System.Reflection;
-using Nethereum.Web3.Accounts;
 using Nethereum.RPC.NonceServices;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Oracle888730.Utility
 {
@@ -24,13 +25,16 @@ namespace Oracle888730.Utility
         public static Web3 web3;
         public static Oracle888730Service contractService;
         private Config config;
-        private string listenersNameSpace;
-        private InMemoryNonceService inMemoryNonceService;
+        private List<string> nameSpaces;
         private Account account;
+        private string message;
 
         public DeployHelper(Config _config) {
             config = _config;
-            listenersNameSpace = "Classes.Listeners";
+            nameSpaces = new List<string>();
+            nameSpaces.Add("Classes.Listeners");
+            nameSpaces.Add("Classes.Handlers");
+            message = "[DeployHelper]";
         } 
 
         public void ConnectOrDeploy() {
@@ -49,13 +53,15 @@ namespace Oracle888730.Utility
         public void StartListener()
         {
             List<Thread> threadList = new List<Thread>();
-            List<Type> listeners = ModulesHelper.GetTypes(listenersNameSpace);
-            inMemoryNonceService = new InMemoryNonceService(config.RpcServer.PublicKey, web3.Client);
-            listeners.ForEach(x =>
-            {
-                GenericListener current = ModulesHelper.GetInstance<GenericListener>(x, new object[] {web3, config, account, inMemoryNonceService });
-                threadList.Add(current.Start());
+            nameSpaces.ForEach(x => {
+                List<Type> types = ModulesHelper.GetTypes(x);
+                types.ForEach(z => {
+                    dynamic current = ModulesHelper.GetInstance<dynamic>(z, new object[] {web3, config});
+                    threadList.Add(((IGeneric)current).Start());
+                    current = null;
+                });
             });
+            threadList.Add(new SubscribersEnqueuer().Start());
             threadList.ForEach(x =>
             {
                 x.Join();
@@ -78,8 +84,29 @@ namespace Oracle888730.Utility
                 contractService = new Oracle888730Service(web3, contractAddress);
                 var contractName = await contractService.OracleNameQueryAsync();
                 Console.WriteLine("[PROGRAM] Contract " + contractName + " created at address: " + contractAddress);
+                if (config.RpcServer.SecondaryAddresses != null)
+                {
+                    config.RpcServer.SecondaryAddresses.ToList().ForEach(x =>
+                    {
+                        var receipt = contractService.AddOracleSecondaryAccountRequestAndWaitForReceiptAsync(x[0]);
+                        receipt.Wait();
+                        if(receipt.Result.Status.Value == 0)
+                        {
+                            throw new Exception("Config.e");
+                        }
+                        else
+                        {
+                            Console.WriteLine("[PROGRAM] Oracle secondary address added to new contract.");
+                        }
+                    });
+                }
+                else
+                {
+                    Console.WriteLine("[PROGRAM] No secondary Addresses");
+                }
+                
             }
-            catch
+            catch (Exception e)
             {
                 Console.WriteLine("[ERR] Couldn't deploy the contract.");
                 Console.WriteLine("[ADVISE] Check that ur RPC client is running.");
@@ -99,7 +126,7 @@ namespace Oracle888730.Utility
                 var contractName = await contractService.OracleNameQueryAsync();
                 Console.WriteLine("[PROGRAM] Connecting to contract " + contractName + " with address: " + contractAddress);
             }
-            catch
+            catch (Exception e)
             {
                 Console.WriteLine("[ERR] Couldn't connect to contract.");
                 Console.WriteLine("[ADVISE] Check that ur RPC client is running and check \nthat the contract address in your config.json file is correct. ");

@@ -6,7 +6,6 @@ import "./Oracle888730.sol";
 contract Client888730 {
     address public clientOwner;
     address payable public oracleAddress;
-    address payable public secondAddress;
     Value public lastResponse;
 
     struct Value {
@@ -15,10 +14,9 @@ contract Client888730 {
         string value;
     }
 
-    constructor(address payable _oracleAddress, address payable _secondAddress){
+    constructor(address payable _oracleAddress){
         clientOwner = msg.sender;
         oracleAddress = _oracleAddress;
-        secondAddress = _secondAddress;
         lastResponse = Value("NO",0,"0");
     }
 
@@ -28,7 +26,7 @@ contract Client888730 {
     }
 
     modifier onlyOracle() {
-        require ( msg.sender == oracleAddress || msg.sender == secondAddress, "You are not the oracle" );
+        require ( msg.sender == oracleAddress, "You are not the oracle" );
         _;
     }
 

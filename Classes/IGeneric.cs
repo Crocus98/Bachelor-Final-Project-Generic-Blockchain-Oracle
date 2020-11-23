@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace Oracle888730.Classes
 {
-    interface IGenericListener
+    interface IGeneric
     {
         public Thread Start();
 

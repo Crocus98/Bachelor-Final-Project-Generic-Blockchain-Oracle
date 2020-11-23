@@ -13,11 +13,10 @@ using Nethereum.ABI.FunctionEncoding.Attributes;
 
 namespace Oracle888730.Classes
 {
-    abstract class GenericHandler
+    abstract class GenericHandler : IGeneric
     {
         protected string message;
         protected Oracle888730Service contractService;
-        protected GenericAPIHelper apiHelper;
         protected Web3 web3;
         protected Config config;
 
@@ -28,10 +27,11 @@ namespace Oracle888730.Classes
             config = _config;
         }
 
-        public void Start(RequestEventEventDTO _event)
+        public Thread Start()
         {
-            Thread requestHandlerThread = new Thread(Handler);
-            requestHandlerThread.Start();
+            Thread handlerThread = new Thread(Handler);
+            handlerThread.Start();
+            return handlerThread;
         }
 
         protected abstract void Handler();

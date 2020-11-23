@@ -18,7 +18,11 @@ namespace Oracle888730
             StringWriter sw = new StringWriter();
             DeployHelper deployHelper = new DeployHelper(config);
             deployHelper.ConnectOrDeploy();
-            deployHelper.StartListener();
+            try {
+                deployHelper.StartListener();
+            }
+            catch(Exception e) { Console.WriteLine(e.Message); }
+            
         }
 
         static void CurrentDomainProcessExit(object sender, EventArgs e)

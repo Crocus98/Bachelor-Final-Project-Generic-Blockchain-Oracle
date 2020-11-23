@@ -13,7 +13,7 @@ using Nethereum.RPC.NonceServices;
 
 namespace Oracle888730.Classes
 {
-    abstract class GenericListener : IGenericListener
+    abstract class GenericListener : IGeneric
     {
         protected Web3 web3;
         protected Config config;
