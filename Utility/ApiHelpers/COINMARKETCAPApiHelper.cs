@@ -15,7 +15,7 @@ namespace Oracle888730.Utility.ApiHelpers
         public override string GetWantedValue(string _wantedChange)
         {
             Thread.Sleep(50);
-            return "100.00";
+            return "100.00 " + _wantedChange;
         }
     }
 }

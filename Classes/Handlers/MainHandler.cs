@@ -42,24 +42,13 @@ namespace Oracle888730.Classes.Handlers
             List<RequestEventEventDTO> tempEventList = null;
             try
             {
-                StringWriter.Enqueue(message + " Handler setup started...");
-                Queue<Oracle888730Service> services = new Queue<Oracle888730Service>();
-                services.Enqueue(contractService);
-                config.RpcServer.SecondaryAddresses.ToList().ForEach(x =>
-                {
-                    Account secondaryAccount = new Account(x[1]);
-                    Web3 secondaryAccountWeb3 = new Web3(secondaryAccount, config.RpcServer.Url);
-                    services.Enqueue(new Oracle888730Service(secondaryAccountWeb3, config.Oracle.ContractAddress));
-                });
-                ThreadPool.SetMinThreads(0, 0);
-                ThreadPool.SetMaxThreads(services.Count(), 0);
-                StringWriter.Enqueue(message + " Handler started with "+ services.Count() + " services (Threads)");
+                Queue<Oracle888730Service> services = SetupHandlerAndGetServices();
                 while (true)
                 {
                     tempEventList = GetList();
                     if(tempEventList == null)
                     {
-                        Thread.Sleep(1000);
+                        Thread.Sleep(500);
                         continue;
                     }
                     tempEventList.ForEach(x => {
@@ -78,40 +67,38 @@ namespace Oracle888730.Classes.Handlers
                 Handler();
             }
         }
+        private Queue<Oracle888730Service> SetupHandlerAndGetServices()
+        {
+            StringWriter.Enqueue(message + " Handler setup started...");
+            Queue<Oracle888730Service> services = new Queue<Oracle888730Service>();
+            //services.Enqueue(contractService);
+            config.RpcServer.SecondaryAddresses.ToList().ForEach(x =>
+            {
+                Account secondaryAccount = new Account(x[1]);
+                Web3 secondaryAccountWeb3 = new Web3(secondaryAccount, config.RpcServer.Url);
+                services.Enqueue(new Oracle888730Service(secondaryAccountWeb3, config.Oracle.ContractAddress));
+            });
+            ThreadPool.SetMinThreads(0, 0);
+            ThreadPool.SetMaxThreads(services.Count(), 0);
+            StringWriter.Enqueue(message + " Handler started with " + services.Count() + " threads");
+            return services;
+        }
 
         private void HandleMethod(RequestEventEventDTO _eventToHandle, Oracle888730Service _service, Queue<Oracle888730Service> _services)
         {
             try
             {
-                bool checkContainsKey;
-                lock (apiHelpersTypes)
-                {
-                    checkContainsKey = apiHelpersTypes.ContainsKey(_eventToHandle.RequestService);
-                }
-                // TODO Separe void CheckConstainsKey
-                if (!checkContainsKey)
+                if (!CheckDictionaryContainsKey(_eventToHandle.RequestService))
                 {
                     Type apiHelperTypeForDictionary = ModulesHelper.GetType(_eventToHandle.RequestService, apiHelpersNamespace);
                     if(apiHelperTypeForDictionary == null)
                     {
                         throw new Exception("There is no service like: "+_eventToHandle.RequestService + " Asked from: " + _eventToHandle.Sender);
                     }
-                    lock (apiHelpersTypes)
-                    {
-                        apiHelpersTypes.Add(_eventToHandle.RequestService, apiHelperTypeForDictionary);
-                    }
+                    AddElementToDictionary(_eventToHandle.RequestService, apiHelperTypeForDictionary);
                 }
-                // TODO Separe void CallApiService
-                Type apiHelperType;
-                lock (apiHelpersTypes)
-                {
-                    apiHelperType = apiHelpersTypes[_eventToHandle.RequestService];
-                }
-                GenericAPIHelper genericAPIHelper = ModulesHelper.GetInstance<GenericAPIHelper>(apiHelperType);
                 // TODO Check exist
-                string serviceTypeString = OracleContext.GetRequestedType(_eventToHandle.RequestService, (int)_eventToHandle.RequestServiceType).ServiceTypeString;
-
-                string wantedValue = genericAPIHelper.GetWantedValue(serviceTypeString);
+                string wantedValue = GetValueFromApi(_eventToHandle);
                 var receipt = _service.SendResponseRequestAndWaitForReceiptAsync(
                         clientAddress: _eventToHandle.Sender,
                         service: _eventToHandle.RequestService,
@@ -119,24 +106,65 @@ namespace Oracle888730.Classes.Handlers
                         value: wantedValue
                         );
                 receipt.Wait();
-
                 if (receipt.Result.Status.Value == 1)
                 {
-                    StringWriter.Enqueue(message + " Successfull request handled for service: " + _eventToHandle.RequestService + " for type: " + serviceTypeString + " From: " + _eventToHandle.Sender + " Result: " + wantedValue);
+                    StringWriter.Enqueue(message + " Successfull request handled for service: " + _eventToHandle.RequestService + " for type: " + wantedValue + " From: " + _eventToHandle.Sender + " Result: " + wantedValue);
                 }
                 else
                 {
-                    throw new Exception("Failed to send result on blockchain (Re-Enqueued...). From: " + _eventToHandle.Sender + " Service: " + _eventToHandle.RequestService + " ServiceType: " + serviceTypeString);
+                    EnqueueEvent(_eventToHandle);
+                    throw new Exception("Failed to send result on blockchain (Re-Enqueued...). From: " + _eventToHandle.Sender + " Service: " + _eventToHandle.RequestService + " ServiceType: " + wantedValue);
                 }
             }
             catch(Exception e)
             {
-                EnqueueEvent(_eventToHandle);
-                StringWriter.Enqueue(message+ " " + e.Message);
+                StringWriter.Enqueue(message+ "[ERROR] " + e.Message);
             }
             finally
             {
                 EnqueueService(_service,_services);
+            }
+        }
+
+        private string GetValueFromApi(RequestEventEventDTO _eventToHandle)
+        {
+            //TODO CHECK
+            GenericAPIHelper genericAPIHelper;
+            lock (apiHelpersTypes)
+            {
+                genericAPIHelper = ModulesHelper
+                    .GetInstance<GenericAPIHelper>(
+                        apiHelpersTypes[_eventToHandle.RequestService]
+                    );
+            }
+            ServiceType serviceType = OracleContext.GetRequestedType(
+                    _eventToHandle.RequestService,
+                    (int)_eventToHandle.RequestServiceType
+                );
+            string serviceTypeString = "";
+            if (serviceType != null)
+            {
+                serviceTypeString = serviceType.ServiceTypeString;
+            }
+            return genericAPIHelper.GetWantedValue(serviceTypeString);
+        }
+
+        private void AddElementToDictionary(string _serviceName, Type _type)
+        {
+            lock (apiHelpersTypes)
+            {
+                if (!CheckDictionaryContainsKey(_serviceName))
+                {
+                    apiHelpersTypes.Add(_serviceName, _type);
+                }
+            }
+        }
+
+        private bool CheckDictionaryContainsKey(string _serviceName)
+        {
+            lock (apiHelpersTypes)
+            {
+                return apiHelpersTypes.ContainsKey(_serviceName);
             }
         }
 
@@ -175,7 +203,7 @@ namespace Oracle888730.Classes.Handlers
                 }
                 else
                 {
-                    Thread.Sleep(50);
+                    Thread.Sleep(10);
                 }
             }
             return service;
