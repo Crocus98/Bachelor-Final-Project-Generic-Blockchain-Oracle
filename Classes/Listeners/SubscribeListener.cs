@@ -49,19 +49,25 @@ namespace Oracle888730.Classes.Listeners
             }
         }
 
+        //Effettua i controlli e aggiunge il subscriber nel db
         private void AddSubscriber(EventLog<SubscribeEventEventDTO> _request) {
             string address = _request.Event.Sender;
             string serviceType = _request.Event.SubscribeService;
             int serviceTypeValue = (int)_request.Event.SubscribeServiceType;
-            ServiceType checkServiceType = OracleContext.GetRequestedType(serviceType, serviceTypeValue);
+            ServiceType checkServiceType = OracleContext.GetRequestedType(
+                serviceType, 
+                serviceTypeValue
+                );
             if (checkServiceType == null)
             {
                 StringWriter.Enqueue(message + "[ERROR] Failed subscription for non existent service: " + serviceType + " from address: " + address);
             }
             else
             {
-                bool result = OracleContext.AddSubscriber(
-                    CreateSubscriber(address, checkServiceType.ServiceTypeId)
+                bool result = OracleContext.AddSubscriber(CreateSubscriber(
+                    address, 
+                    checkServiceType.ServiceTypeId
+                    )
                 );
                 if (result)
                 {
@@ -74,6 +80,7 @@ namespace Oracle888730.Classes.Listeners
             }
         }
 
+        //Crea l'oggetto subscriber per l'inserimento in Db
         private Subscriber CreateSubscriber(string _address, int _serviceTypeId)
         {
             return new Subscriber

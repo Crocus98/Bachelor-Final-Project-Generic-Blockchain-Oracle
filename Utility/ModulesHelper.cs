@@ -9,6 +9,7 @@ namespace Oracle888730.Utility
 {
     class ModulesHelper
     {
+        //Ottiene il tipo dalla stringa
         public static Type GetType(string _serviceName, string _nameSpace)
         {
             var r = Assembly
@@ -23,6 +24,7 @@ namespace Oracle888730.Utility
             return r;
         }
 
+        //Ottiene la lista dei tipi nel namespace
         public static List<Type> GetTypes(string _nameSpace)
         {
             return Assembly
@@ -35,7 +37,7 @@ namespace Oracle888730.Utility
                 ).ToList();
         }
 
-
+        //Crea e restituisce l'istanza del tipo passato come parametro
         public static T GetInstance<T>(Type _type, object[] _parameters = null)
         {
             return Activator

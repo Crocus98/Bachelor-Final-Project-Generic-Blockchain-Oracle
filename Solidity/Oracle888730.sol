@@ -86,7 +86,7 @@ contract Oracle888730 {
     
     //Response
     function SendResponse(address _clientAddress,string memory _service, uint  _serviceType, string memory _value) public onlyOracleOwner {
-        //_value potrebbe essere un JSON
+        //_value ovvero il valore della risposta potrebbe essere un JSON e contenere più informazioni raggruppate
         Client888730 client = Client888730(address(_clientAddress));
         client.GetResponse(_service, _serviceType, _value);
     }

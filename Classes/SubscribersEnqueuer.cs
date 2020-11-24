@@ -57,6 +57,7 @@ namespace Oracle888730.Classes
             }
         }
 
+        //Accoda gli eventi nel main handler
         private void EnqueueEvents(List<Subscriber> _subscribers)
         {
             _subscribers.ForEach(x =>
@@ -71,6 +72,7 @@ namespace Oracle888730.Classes
             });
         }
 
+        //Attende un certo lasso di tempo  costante
         private void WaitTime(Stopwatch _stopWatch)
         {
             object temp = new object();

@@ -13,6 +13,7 @@ namespace Oracle888730.OracleEF
 {
     partial class OracleContext
     {
+        //Aggiunge un nuovo subscriber
         public static bool AddSubscriber(Subscriber _subscriber)
         {
             using (var _context = new OracleContext())
@@ -25,10 +26,11 @@ namespace Oracle888730.OracleEF
                     _context.Subscribers.Add(_subscriber);
                     return _context.SaveChanges() > 0;
                 }
-                return false;
             }
+            return false;
         }
 
+        //Ottiene la lista dei subscribers
         public static List<Subscriber> GetSubscribers(string _service = null, int? _serviceType = null)
         {
             List<Subscriber> entities;

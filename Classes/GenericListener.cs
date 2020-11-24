@@ -34,6 +34,7 @@ namespace Oracle888730.Classes
             return threadListener;
         }
 
+        //Metodo che ottiene il tipo di evento che viene rilevato dalla classe listener figlia
         protected Event GetEvent(string _eventName)
         {
             StringWriter.Enqueue(message + " Listener setup started...");
@@ -45,6 +46,7 @@ namespace Oracle888730.Classes
             return genericEvent;
         }
 
+        //Metodo che ottiene il blocco da cui iniziare a rilevare gli eventi scritti su blockchain
         protected HexBigInteger RetrieveLatestBlockToRead(Event _event)
         {
             HexBigInteger latestBlock;

@@ -67,6 +67,7 @@ namespace Oracle888730.Classes.Handlers
                 Handler();
             }
         }
+
         private Queue<Oracle888730Service> SetupHandlerAndGetServices()
         {
             StringWriter.Enqueue(message + " Handler setup started...");
@@ -158,7 +159,7 @@ namespace Oracle888730.Classes.Handlers
                     _eventToHandle.RequestService,
                     (int)_eventToHandle.RequestServiceType
                 );
-            string serviceTypeString = "";
+            string serviceTypeString;
             if (serviceType != null)
             {
                 serviceTypeString = serviceType.ServiceTypeString;

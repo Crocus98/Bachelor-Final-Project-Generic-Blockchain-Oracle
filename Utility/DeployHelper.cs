@@ -36,6 +36,7 @@ namespace Oracle888730.Utility
             config = _config;
         }
 
+        //Avvia l'oracolo secondo la procedura adatta
         public void ConnectOrDeploy() {
             var contractAddress = config.Oracle.ContractAddress;
             if (contractAddress != null && contractAddress.Length >= 40)
@@ -49,6 +50,7 @@ namespace Oracle888730.Utility
 
         }
 
+        //Chiama i metodi che avviano i thread necessari al oracolo per funzionare
         public void StartOracle()
         {
             List<Thread> threadList = new List<Thread>();
@@ -78,7 +80,7 @@ namespace Oracle888730.Utility
                 });
             });
         }
-
+        //Effettua il deploy del contratto se non già presente su blockchain
         private async Task DeployAsync(Config _config)
         {
             try
@@ -127,6 +129,7 @@ namespace Oracle888730.Utility
             }
         }
 
+        //Connette l'applicazione al contratto su blockchcain
         private async Task ConnectAsync(Config _config)
         {
             try
@@ -146,6 +149,8 @@ namespace Oracle888730.Utility
                 Config.Exit();
             }
         }
+
+        //Imposta il Web3 dell'account principale
         private void SetWeb3(Config _config)
         {
             var url = _config.RpcServer.Url;
@@ -155,6 +160,7 @@ namespace Oracle888730.Utility
             web3 = new Web3(account, url);
         }
 
+        //Imposta l'Abi del contratto
         private void SetAbi(Config _config)
         {
             if (_config.Oracle.Abi == null || _config.Oracle.Abi == "")

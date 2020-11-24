@@ -18,6 +18,7 @@ namespace Oracle888730.Utility
             nameSpace = "Utility.ApiHelpers";
         }
 
+        //Ritorna il valore voluto dall'API chiamata. La stringa potrebbe anche essere un JSON
         public abstract string GetWantedValue(string _wantedChange);
     }
 }

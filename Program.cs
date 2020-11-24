@@ -12,10 +12,14 @@ namespace Oracle888730
         static void Main()
         {
             Console.WriteLine("[PROGRAM] Oracle888730 starting...");
+            //Avviamento del servizio che gestisce la console
             StringWriter stringWriter = new StringWriter();
             SetupDb();
+            //Caricamento dei dati dal file di config
             config = Config.Load();
+            //Aggiunta event handler per salvataggio del file di config all'uscita del programma
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomainProcessExit);
+            //Classe per la connessione ad un contratto o in sua mancanza per la sua creazione
             DeployHelper deployHelper = new DeployHelper(config);
             deployHelper.ConnectOrDeploy();
             deployHelper.StartOracle();

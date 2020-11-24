@@ -27,6 +27,7 @@ namespace Oracle888730.Utility
             writeMessages.Start();
         }
 
+        //Controlla l'accesso concorrente alla coda di stringhe da stampare
         public static void Enqueue(string _stringToEnqueue)
         {
             lock (stringsToBeWritten) { 
@@ -34,6 +35,7 @@ namespace Oracle888730.Utility
             }
         }
 
+        //Scrive a console le stringhe prelevate dalla coda
         private void DoWork()
         {
             while (true)
@@ -53,6 +55,7 @@ namespace Oracle888730.Utility
             }
         }
 
+        //Svuota la coda delle strighe
         private Queue<string> GetList()
         {
             Queue<string> temporaryList;

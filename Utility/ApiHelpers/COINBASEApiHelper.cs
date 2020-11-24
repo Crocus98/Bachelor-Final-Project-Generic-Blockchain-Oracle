@@ -8,7 +8,7 @@ namespace Oracle888730.Utility.ApiHelpers
 {
     class COINBASEAPIHelper : GenericAPIHelper
     {
-        CoinbaseClient coinbaseClient;
+        readonly CoinbaseClient coinbaseClient;
 
         public COINBASEAPIHelper() : base()
         {

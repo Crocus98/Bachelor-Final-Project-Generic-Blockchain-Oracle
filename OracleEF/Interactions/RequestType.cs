@@ -14,6 +14,7 @@ namespace Oracle888730.OracleEF
 {
     partial class OracleContext
     {
+        //Ottiene il Service type e il Service
         public static ServiceType GetRequestedType(string _serviceName,int _serviceTypeId)
         {
             ServiceType entity;

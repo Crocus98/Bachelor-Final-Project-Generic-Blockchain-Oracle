@@ -20,6 +20,7 @@ namespace Oracle888730.Classes.Listeners
             message = "[RequestListener]";
         }
 
+        //Accoda semplicemente l'evento della richiesta nella coda dell'handler
         protected override async void Listener()
         {
             try
@@ -46,9 +47,7 @@ namespace Oracle888730.Classes.Listeners
             {
                 StringWriter.Enqueue(message + "[ERROR] Exception stopped the listener thread " + e.Message );
                 Listener();
-            }
-            
+            } 
         }
     }
-
 }
