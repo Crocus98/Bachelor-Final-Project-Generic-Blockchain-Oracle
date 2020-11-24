@@ -88,33 +88,9 @@ namespace Oracle888730.Classes.Handlers
         {
             try
             {
-                if (!CheckDictionaryContainsKey(_eventToHandle.RequestService))
-                {
-                    Type apiHelperTypeForDictionary = ModulesHelper.GetType(_eventToHandle.RequestService, apiHelpersNamespace);
-                    if(apiHelperTypeForDictionary == null)
-                    {
-                        throw new Exception("There is no service like: "+_eventToHandle.RequestService + " Asked from: " + _eventToHandle.Sender);
-                    }
-                    AddElementToDictionary(_eventToHandle.RequestService, apiHelperTypeForDictionary);
-                }
-                // TODO Check exist
+                CheckApiDictionary(_eventToHandle);
                 string wantedValue = GetValueFromApi(_eventToHandle);
-                var receipt = _service.SendResponseRequestAndWaitForReceiptAsync(
-                        clientAddress: _eventToHandle.Sender,
-                        service: _eventToHandle.RequestService,
-                        serviceType: _eventToHandle.RequestServiceType,
-                        value: wantedValue
-                        );
-                receipt.Wait();
-                if (receipt.Result.Status.Value == 1)
-                {
-                    StringWriter.Enqueue(message + " Successfull request handled for service: " + _eventToHandle.RequestService + " for type: " + wantedValue + " From: " + _eventToHandle.Sender + " Result: " + wantedValue);
-                }
-                else
-                {
-                    EnqueueEvent(_eventToHandle);
-                    throw new Exception("Failed to send result on blockchain (Re-Enqueued...). From: " + _eventToHandle.Sender + " Service: " + _eventToHandle.RequestService + " ServiceType: " + wantedValue);
-                }
+                SendTransaction(_eventToHandle,_service, wantedValue );
             }
             catch(Exception e)
             {
@@ -126,9 +102,50 @@ namespace Oracle888730.Classes.Handlers
             }
         }
 
+        private void SendTransaction(RequestEventEventDTO _eventToHandle,Oracle888730Service _service, string _wantedValue)
+        {
+            try
+            {
+                var receipt = _service.SendResponseRequestAndWaitForReceiptAsync(
+                    clientAddress: _eventToHandle.Sender,
+                    service: _eventToHandle.RequestService,
+                    serviceType: _eventToHandle.RequestServiceType,
+                    value: _wantedValue
+                    );
+                receipt.Wait();
+                if (receipt.Result.Status.Value == 1)
+                {
+                    StringWriter.Enqueue(message + " Successfull request handled for service: " + _eventToHandle.RequestService + " for type: " + _eventToHandle.RequestServiceType + " From: " + _eventToHandle.Sender + " Result: " + _wantedValue);
+                }
+            }
+            catch
+            {
+                EnqueueEvent(_eventToHandle);
+                throw new Exception("Failed to send result on blockchain (Re-Enqueued...). From: " + _eventToHandle.Sender + " Service: " + _eventToHandle.RequestService + " ServiceType: " + _eventToHandle.RequestServiceType);
+            }
+        }
+        private void CheckApiDictionary(RequestEventEventDTO _eventToHandle)
+        {
+            if (!CheckDictionaryContainsKey(_eventToHandle.RequestService))
+            {
+                try
+                {
+                    Type apiHelperTypeForDictionary = ModulesHelper.GetType(_eventToHandle.RequestService, apiHelpersNamespace);
+                    if (apiHelperTypeForDictionary == null)
+                    {
+                        throw new Exception();
+                    }
+                    AddElementToDictionary(_eventToHandle.RequestService, apiHelperTypeForDictionary);
+                }
+                catch
+                {
+                    throw new Exception("There is no service like: " + _eventToHandle.RequestService + " Asked from: " + _eventToHandle.Sender);
+                }
+            }
+        }
+
         private string GetValueFromApi(RequestEventEventDTO _eventToHandle)
         {
-            //TODO CHECK
             GenericAPIHelper genericAPIHelper;
             lock (apiHelpersTypes)
             {
@@ -145,6 +162,10 @@ namespace Oracle888730.Classes.Handlers
             if (serviceType != null)
             {
                 serviceTypeString = serviceType.ServiceTypeString;
+            }
+            else
+            {
+                throw new Exception("Failed request for non existent service type " + _eventToHandle.RequestServiceType + " of service "+ _eventToHandle.RequestService+ ". From address: " + _eventToHandle.Sender);
             }
             return genericAPIHelper.GetWantedValue(serviceTypeString);
         }

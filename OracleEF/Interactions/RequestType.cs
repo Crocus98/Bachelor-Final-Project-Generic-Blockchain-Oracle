@@ -22,7 +22,7 @@ namespace Oracle888730.OracleEF
                 entity = (from x in _context.ServiceTypes.Include("Service")
                           where x.ServiceTypeId == _serviceTypeId 
                           && x.Service.ServiceName == _serviceName
-                          select x).First();
+                          select x).FirstOrDefault();
             }
             return entity;
         }

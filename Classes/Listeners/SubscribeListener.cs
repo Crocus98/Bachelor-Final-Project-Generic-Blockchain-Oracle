@@ -56,7 +56,7 @@ namespace Oracle888730.Classes.Listeners
             ServiceType checkServiceType = OracleContext.GetRequestedType(serviceType, serviceTypeValue);
             if (checkServiceType == null)
             {
-                StringWriter.Enqueue(message + "[WARNING] Failed subscription for non existent service: " + serviceType + " from address: " + address);
+                StringWriter.Enqueue(message + "[ERROR] Failed subscription for non existent service: " + serviceType + " from address: " + address);
             }
             else
             {

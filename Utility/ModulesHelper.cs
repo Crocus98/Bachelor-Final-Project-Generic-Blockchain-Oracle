@@ -19,7 +19,7 @@ namespace Oracle888730.Utility
                     x.ReflectedType == null &&
                     x.Namespace.EndsWith(_nameSpace) &&
                     x.Name.Contains(_serviceName.ToUpper())
-                ).First();
+                ).FirstOrDefault();
             return r;
         }
 
