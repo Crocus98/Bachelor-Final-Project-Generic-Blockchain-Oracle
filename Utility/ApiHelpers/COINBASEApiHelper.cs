@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Oracle888730.Utility.ApiHelpers
 {
-    class COINBASEAPIHelper : GenericAPIHelper
+    public class COINBASEAPIHelper : GenericAPIHelper
     {
         readonly CoinbaseClient coinbaseClient;
 
@@ -21,14 +21,14 @@ namespace Oracle888730.Utility.ApiHelpers
         }
 
         //Questo metodo ottiene lo spot price per i cambi supportati
-        public async Task<string> GetCoinbaseValue(string _wantedChange)
+        private async Task<string> GetCoinbaseValue(string _wantedChange)
         {
             var spot = await coinbaseClient.Data.GetSpotPriceAsync(_wantedChange);
             if (spot.Errors != null)
             {
                 throw new Exception("CoinBase not available");
             }
-            else if (spot.Data == null)
+            if (spot.Data == null)
             {
                 throw new Exception("Invalid currency pair string");
             }

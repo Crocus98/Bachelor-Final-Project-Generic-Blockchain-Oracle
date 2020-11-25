@@ -24,7 +24,7 @@ namespace Oracle888730.Utility
         
         public static Web3 web3;
         public static Oracle888730Service contractService;
-        private Config config;
+        private readonly Config config;
         private readonly List<string> nameSpaces = new List<string>{
                 "Classes.Listeners",
                 "Classes.Handlers"

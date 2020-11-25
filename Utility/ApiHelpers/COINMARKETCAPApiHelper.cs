@@ -7,8 +7,7 @@ namespace Oracle888730.Utility.ApiHelpers
 {
 
     //Classe Stub per testare la molteplicità di servizi
-
-    class COINMARKETCAPApiHelper : GenericAPIHelper
+    public class COINMARKETCAPApiHelper : GenericAPIHelper
     {
         public COINMARKETCAPApiHelper() : base()
         {

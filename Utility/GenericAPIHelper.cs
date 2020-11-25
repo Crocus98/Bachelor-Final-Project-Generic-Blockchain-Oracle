@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Oracle888730.Utility
 {
-    abstract class GenericAPIHelper
+    public abstract class GenericAPIHelper
     {
         protected string nameSpace;
         protected string message;

@@ -12,7 +12,7 @@ namespace Oracle888730.Utility
     class StringWriter
     {
         private static Queue<string> stringsToBeWritten;
-        private string message = "[StringWriter]";
+        private readonly string message = "[StringWriter]";
 
         public StringWriter()
         {
