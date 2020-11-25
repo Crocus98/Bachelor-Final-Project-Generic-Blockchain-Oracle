@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Oracle888730.OracleEF
 {
-    partial class OracleContext : DbContext
+    public partial class OracleContext : DbContext
     {
         public DbSet<Subscriber> Subscribers { get; set; }
 
@@ -44,7 +44,5 @@ namespace Oracle888730.OracleEF
                 HasForeignKey(x => x.ServiceTypeForeignKey).
                 HasConstraintName("FK_Subscriber_ServiceType_ServiceTypeId");
         }
-
-
     }
 }

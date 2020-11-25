@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Oracle888730.OracleEF
 {
-    partial class OracleContext
+    public partial class OracleContext
     {
         //Aggiunge un nuovo subscriber
         public static bool AddSubscriber(Subscriber _subscriber)

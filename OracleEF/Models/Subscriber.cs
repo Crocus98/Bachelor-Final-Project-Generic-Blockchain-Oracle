@@ -13,7 +13,7 @@ namespace Oracle888730.OracleEF.Models
         public int SubscriberId { get; set; }
         [Required]
         public string Address { get; set; }
-
+        [Required]
         public int ServiceTypeForeignKey { get; set; }
 
         public ServiceType ServiceType{ get; set; }

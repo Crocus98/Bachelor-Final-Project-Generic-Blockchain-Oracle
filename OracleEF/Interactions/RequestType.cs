@@ -12,9 +12,9 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace Oracle888730.OracleEF
 {
-    partial class OracleContext
+    public partial class OracleContext
     {
-        //Ottiene il Service type e il Service
+        //Ottiene l'oggetto Service type
         public static ServiceType GetRequestedType(string _serviceName,int _serviceTypeId)
         {
             ServiceType entity;
