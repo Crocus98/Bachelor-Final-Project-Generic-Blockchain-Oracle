@@ -122,7 +122,7 @@ namespace Oracle888730.Classes.Handlers
             catch
             {
                 EnqueueEvent(_eventToHandle);
-                throw new Exception("Failed to send result on blockchain (Re-Enqueued...). From: " + _eventToHandle.Sender + " Service: " + _eventToHandle.RequestService + " ServiceType: " + _eventToHandle.RequestServiceType);
+                throw new Exception("Failed to send result on blockchain (Re-Enqueued...). From: " + _eventToHandle.Sender + " Service: " + _eventToHandle.RequestService + " ServiceType: " + _eventToHandle.RequestServiceType + " Thread: " + Thread.CurrentThread.ManagedThreadId);
             }
         }
         private void CheckApiDictionary(RequestEventEventDTO _eventToHandle)

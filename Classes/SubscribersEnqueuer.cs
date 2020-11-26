@@ -45,7 +45,7 @@ namespace Oracle888730.Classes
                     else
                     {
                         timer.Stop();
-                        Thread.Sleep(500);
+                        Thread.Sleep(1000);
                     }
                     timer.Reset();
                 }

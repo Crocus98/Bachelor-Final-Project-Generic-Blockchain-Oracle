@@ -39,7 +39,7 @@ namespace Oracle888730.Classes.Listeners
                     }
                     else
                     {
-                        Thread.Sleep(500);
+                        Thread.Sleep(1000);
                     }
                 }
             }
