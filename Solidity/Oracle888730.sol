@@ -75,12 +75,12 @@ contract Oracle888730 {
     }
 
     //Push based inbound oracle request
-    function GetSubscribeRequest(string calldata _service, uint _serviceType) external payable {
+    function GetSubscribeRequest(string calldata _service, uint _serviceType) external {
         emit SubscribeEvent(msg.sender, _service, _serviceType);
     }
 
     //Pull based inbound oracle request
-    function GetRequest(string calldata _service, uint _serviceType) external payable {
+    function GetRequest(string calldata _service, uint _serviceType) external {
         emit RequestEvent(msg.sender, _service, _serviceType);
     }
     

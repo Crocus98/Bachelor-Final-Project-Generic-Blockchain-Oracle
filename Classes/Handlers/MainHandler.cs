@@ -29,6 +29,7 @@ namespace Oracle888730.Classes.Handlers
         protected static Queue<RequestEventEventDTO> queueEventsToHandle;
         protected Dictionary<string, Type> apiHelpersTypes;
         protected string apiHelpersNamespace = "Utility.ApiHelpers";
+        private static readonly object syncObject = new object();
 
         public MainHandler(Web3 _web3, Config _config ) : base (_web3, _config)
         {
@@ -119,10 +120,10 @@ namespace Oracle888730.Classes.Handlers
                     StringWriter.Enqueue(message + " Successfull request handled for service: " + _eventToHandle.RequestService + " for type: " + _eventToHandle.RequestServiceType + " From: " + _eventToHandle.Sender + " Result: " + _wantedValue);
                 }
             }
-            catch
+            catch (Exception e)
             {
                 EnqueueEvent(_eventToHandle);
-                throw new Exception("Failed to send result on blockchain (Re-Enqueued...). From: " + _eventToHandle.Sender + " Service: " + _eventToHandle.RequestService + " ServiceType: " + _eventToHandle.RequestServiceType + " Thread: " + Thread.CurrentThread.ManagedThreadId);
+                throw new Exception("Failed to send result on blockchain " +e.Message +" (Re-Enqueued...). From: " + _eventToHandle.Sender + " Service: " + _eventToHandle.RequestService + " ServiceType: " + _eventToHandle.RequestServiceType + " Thread: " + Thread.CurrentThread.ManagedThreadId);
             }
         }
         private void CheckApiDictionary(RequestEventEventDTO _eventToHandle)
@@ -211,24 +212,27 @@ namespace Oracle888730.Classes.Handlers
                 _services.Enqueue(_service);
             }
         }
-        private Oracle888730Service DequeueService(Queue<Oracle888730Service> _services)
+        private  Oracle888730Service DequeueService(Queue<Oracle888730Service> _services)
         {
-            Oracle888730Service service = null;
-            while (service == null)
+            lock (syncObject)
             {
-                if (_services.Count > 0)
+                Oracle888730Service service = null;
+                while (service == null)
                 {
-                    lock (_services)
+                    if (_services.Count > 0)
                     {
-                        service = _services.Dequeue();
+                        lock (_services)
+                        {
+                            service = _services.Dequeue();
+                        }
+                    }
+                    else
+                    {
+                        Thread.Sleep(10);
                     }
                 }
-                else
-                {
-                    Thread.Sleep(10);
-                }
+                return service;
             }
-            return service;
         }
 
         public static void EnqueueEvent(RequestEventEventDTO _event)

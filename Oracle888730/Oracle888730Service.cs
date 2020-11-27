@@ -173,28 +173,24 @@ namespace Oracle888730.Contracts.Oracle888730
 
         public Task<string> SendResponseRequestAsync(string clientAddress, string service, BigInteger serviceType, string value)
         {
-            var sendResponseFunction = new SendResponseFunction
-            {
-                ClientAddress = clientAddress,
-                Service = service,
-                ServiceType = serviceType,
-                Value = value
-            };
-
-            return ContractHandler.SendRequestAsync(sendResponseFunction);
+            var sendResponseFunction = new SendResponseFunction();
+                sendResponseFunction.ClientAddress = clientAddress;
+                sendResponseFunction.Service = service;
+                sendResponseFunction.ServiceType = serviceType;
+                sendResponseFunction.Value = value;
+            
+             return ContractHandler.SendRequestAsync(sendResponseFunction);
         }
 
         public Task<TransactionReceipt> SendResponseRequestAndWaitForReceiptAsync(string clientAddress, string service, BigInteger serviceType, string value, CancellationTokenSource cancellationToken = null)
         {
-            var sendResponseFunction = new SendResponseFunction
-            {
-                ClientAddress = clientAddress,
-                Service = service,
-                ServiceType = serviceType,
-                Value = value
-            };
-
-            return ContractHandler.SendRequestAndWaitForReceiptAsync(sendResponseFunction, cancellationToken);
+            var sendResponseFunction = new SendResponseFunction();
+                sendResponseFunction.ClientAddress = clientAddress;
+                sendResponseFunction.Service = service;
+                sendResponseFunction.ServiceType = serviceType;
+                sendResponseFunction.Value = value;
+            
+             return ContractHandler.SendRequestAndWaitForReceiptAsync(sendResponseFunction, cancellationToken);
         }
 
         public Task<string> OracleOwnerQueryAsync(OracleOwnerFunction oracleOwnerFunction, BlockParameter blockParameter = null)

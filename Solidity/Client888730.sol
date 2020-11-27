@@ -36,7 +36,7 @@ contract Client888730 {
         string _value
     ); 
 
-    function GetResponse(string calldata _service, uint  _serviceType, string calldata _value) external payable onlyOracle{
+    function GetResponse(string calldata _service, uint  _serviceType, string calldata _value) external onlyOracle{
         lastResponse = Value(_service, _serviceType, _value);
         emit ResponseEvent(_service, _serviceType, _value);
     }
