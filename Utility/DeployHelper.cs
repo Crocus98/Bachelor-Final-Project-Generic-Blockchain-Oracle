@@ -121,7 +121,7 @@ namespace Oracle888730.Utility
                 }
                 
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 StringWriter.Enqueue(message + "[ERR] Couldn't deploy the contract.");
                 StringWriter.Enqueue(message + "[ADVISE] Check that ur RPC client is running.");
@@ -156,7 +156,6 @@ namespace Oracle888730.Utility
             var url = _config.RpcServer.Url;
             var privateKey = _config.RpcServer.PrivateKey;
             account = new Account(privateKey);
-            // TODO Try
             web3 = new Web3(account, url);
         }
 
