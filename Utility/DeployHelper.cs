@@ -34,11 +34,11 @@ namespace Oracle888730.Utility
             var contractAddress = config.Oracle.ContractAddress;
             if (contractAddress != null && contractAddress.Length >= 40)
             {
-                ConnectAsync(config).Wait();
+                ConnectAsync().Wait();
             }
             else
             {
-                DeployAsync(config).Wait();
+                DeployAsync().Wait();
             }
 
         }
@@ -74,18 +74,18 @@ namespace Oracle888730.Utility
             });
         }
         //Effettua il deploy del contratto se non già presente su blockchain
-        private async Task DeployAsync(Config _config)
+        private async Task DeployAsync()
         {
             try
             {
-                SetAbi(_config);
-                SetWeb3(_config);
+                SetAbi();
+                SetWeb3();
                 var oracle888730Deployment = new Oracle888730Deployment();
                 StringWriter.Enqueue(message + "[PROGRAM] Deploying the smart contract on blockchain..."); 
                 var transactionReceiptDeployment = await web3.Eth.GetContractDeploymentHandler<Oracle888730Deployment>().SendRequestAndWaitForReceiptAsync(oracle888730Deployment);
                 var contractAddress = transactionReceiptDeployment.ContractAddress;
-                _config.Oracle.ContractAddress = contractAddress;
-                _config.Save();
+                config.Oracle.ContractAddress = contractAddress;
+                config.Save();
                 StringWriter.Enqueue(message + "[PROGRAM] Creating contract service...");
                 contractService = new Oracle888730Service(web3, contractAddress);
                 var contractName = await contractService.OracleNameQueryAsync();
@@ -114,7 +114,7 @@ namespace Oracle888730.Utility
                 }
                 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 StringWriter.Enqueue(message + "[ERR] Couldn't deploy the contract.");
                 StringWriter.Enqueue(message + "[ADVISE] Check that ur RPC client is running.");
@@ -123,13 +123,13 @@ namespace Oracle888730.Utility
         }
 
         //Connette l'applicazione al contratto su blockchcain
-        private async Task ConnectAsync(Config _config)
+        private async Task ConnectAsync()
         {
             try
             {
-                SetAbi(_config);
-                SetWeb3(_config);
-                var contractAddress = _config.Oracle.ContractAddress;
+                SetAbi();
+                SetWeb3();
+                var contractAddress = config.Oracle.ContractAddress;
                 StringWriter.Enqueue(message + " Creating contract service...");
                 contractService = new Oracle888730Service(web3, contractAddress);
                 var contractName = await contractService.OracleNameQueryAsync();
@@ -144,18 +144,18 @@ namespace Oracle888730.Utility
         }
 
         //Imposta il Web3 dell'account principale
-        private void SetWeb3(Config _config)
+        private void SetWeb3()
         {
-            var url = _config.RpcServer.Url;
-            var privateKey = _config.RpcServer.PrivateKey;
+            var url = config.RpcServer.Url;
+            var privateKey = config.RpcServer.PrivateKey;
             account = new Account(privateKey);
             web3 = new Web3(account, url);
         }
 
         //Imposta l'Abi del contratto
-        private void SetAbi(Config _config)
+        private void SetAbi()
         {
-            if (_config.Oracle.Abi == null || _config.Oracle.Abi == "")
+            if (config.Oracle.Abi == null || config.Oracle.Abi == "")
             {
                 string path = Directory.GetParent(
                     Directory.GetParent(
@@ -170,8 +170,8 @@ namespace Oracle888730.Utility
                     StringWriter.Enqueue(message + "[ADVISE] Compile your Solidity contract before continuing.");
                     Config.Exit();
                 }
-                _config.Oracle.Abi = File.ReadAllText(path);
-                _config.Save();
+                config.Oracle.Abi = File.ReadAllText(path);
+                config.Save();
             }
         }
 

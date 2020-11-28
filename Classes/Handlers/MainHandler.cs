@@ -110,11 +110,11 @@ namespace Oracle888730.Classes.Handlers
             }
             catch (Exception e)
             {
+                EnqueueEvent(_eventToHandle);
                 lock (syncObject)
                 {
-                    Monitor.Wait(syncObject,500);
+                    Monitor.Wait(syncObject, 2000);
                 }
-                EnqueueEvent(_eventToHandle);
                 throw new Exception("Failed to send result on blockchain " +e.Message +" (Re-Enqueued...). From: " + _eventToHandle.Sender + " Service: " + _eventToHandle.RequestService + " ServiceType: " + _eventToHandle.RequestServiceType + " Thread: " + Thread.CurrentThread.ManagedThreadId);
             }
         }
