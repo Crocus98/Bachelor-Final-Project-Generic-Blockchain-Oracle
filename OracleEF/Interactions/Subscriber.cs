@@ -1,13 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Oracle888730.Contracts.Oracle888730.ContractDefinition;
 using Oracle888730.OracleEF.Models;
-using Oracle888730.Utility;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 
 namespace Oracle888730.OracleEF
 {

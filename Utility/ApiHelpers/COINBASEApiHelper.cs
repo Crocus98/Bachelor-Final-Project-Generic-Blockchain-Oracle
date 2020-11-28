@@ -1,8 +1,5 @@
 ﻿using Coinbase;
-using Coinbase.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Oracle888730.Utility.ApiHelpers

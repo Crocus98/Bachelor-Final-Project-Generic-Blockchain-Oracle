@@ -1,5 +1,4 @@
-﻿using Nethereum.RPC.Shh.DTOs;
-using Oracle888730.Classes.Handlers;
+﻿using Oracle888730.Classes.Handlers;
 using Oracle888730.Contracts.Oracle888730.ContractDefinition;
 using Oracle888730.OracleEF;
 using Oracle888730.OracleEF.Models;
@@ -7,8 +6,6 @@ using Oracle888730.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
-using System.Text;
 using System.Threading;
 
 namespace Oracle888730.Classes

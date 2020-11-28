@@ -1,15 +1,7 @@
 ﻿using Nethereum.Web3;
-using System;
 using Oracle888730.Utility;
 using Oracle888730.Contracts.Oracle888730;
 using System.Threading;
-using Oracle888730.Contracts.Oracle888730.ContractDefinition;
-using Nethereum.RPC.NonceServices;
-using Nethereum.Web3.Accounts;
-using System.Collections;
-using System.Collections.Generic;
-using Nethereum.Contracts;
-using Nethereum.ABI.FunctionEncoding.Attributes;
 
 namespace Oracle888730.Classes
 {

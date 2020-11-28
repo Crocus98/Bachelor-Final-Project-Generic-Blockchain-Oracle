@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Oracle888730.OracleEF.Models;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 
 namespace Oracle888730.OracleEF
 {

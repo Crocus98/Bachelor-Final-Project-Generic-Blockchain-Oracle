@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Coinbase;
-using System.Linq;
-using Coinbase.Models;
-using System.Threading;
-
-namespace Oracle888730.Utility
+﻿namespace Oracle888730.Utility
 {
     public abstract class GenericAPIHelper
     {

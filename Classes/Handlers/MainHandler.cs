@@ -1,26 +1,14 @@
-﻿using Nethereum.ABI.FunctionEncoding.Attributes;
-using Nethereum.Contracts;
-using Nethereum.Web3;
+﻿using Nethereum.Web3;
 using Oracle888730.Utility;
 using System;
-using System.Threading.Tasks;
 using Oracle888730.Contracts.Oracle888730.ContractDefinition;
 using Oracle888730.OracleEF;
 using Oracle888730.OracleEF.Models;
-using System.Numerics;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
-using Org.BouncyCastle.Ocsp;
-using Oracle888730.Utility.ApiHelpers;
-using Flurl.Util;
-using Nethereum.RPC.Eth.DTOs;
 using Oracle888730.Contracts.Oracle888730;
-using Nethereum.RPC.NonceServices;
 using Nethereum.Web3.Accounts;
-using Nethereum.RPC.Web3;
-using System.Diagnostics.Contracts;
-using System.Net.Http.Headers;
 
 namespace Oracle888730.Classes.Handlers
 {

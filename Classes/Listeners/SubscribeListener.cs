@@ -1,15 +1,12 @@
 ﻿using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
-using Nethereum.RPC.NonceServices;
 using Nethereum.Web3;
-using Nethereum.Web3.Accounts;
 using Oracle888730.Contracts.Oracle888730.ContractDefinition;
 using Oracle888730.OracleEF;
 using Oracle888730.OracleEF.Models;
 using Oracle888730.Utility;
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Oracle888730.Classes.Listeners
 {
