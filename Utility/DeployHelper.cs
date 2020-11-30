@@ -40,7 +40,6 @@ namespace Oracle888730.Utility
             {
                 DeployAsync().Wait();
             }
-
         }
 
         //Chiama i metodi che avviano i thread necessari al oracolo per funzionare

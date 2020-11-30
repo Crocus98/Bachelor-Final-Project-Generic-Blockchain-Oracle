@@ -41,6 +41,7 @@ namespace Oracle888730.Classes.Handlers
                         continue;
                     }
                     tempEventList.ForEach(x => {
+                        //Per ogni evento avvio un Thread della ThreadPool
                         Oracle888730Service freeService = DequeueService(services);
                         ThreadPool.QueueUserWorkItem(threadFunction => HandleMethod(x, freeService, services));
                     });
@@ -57,11 +58,11 @@ namespace Oracle888730.Classes.Handlers
             }
         }
 
+        //Inizializzo i servizi e li inserisco nella coda
         private Queue<Oracle888730Service> SetupHandlerAndGetServices()
         {
             StringWriter.Enqueue(message + " Handler setup started...");
             Queue<Oracle888730Service> services = new Queue<Oracle888730Service>();
-            //services.Enqueue(contractService);
             config.RpcServer.SecondaryAddresses.ToList().ForEach(x =>
             {
                 Account secondaryAccount = new Account(x[1]);
@@ -74,6 +75,7 @@ namespace Oracle888730.Classes.Handlers
             return services;
         }
 
+        //Metodo principale di gestione delle richieste
         private void HandleMethod(RequestEventEventDTO _eventToHandle, Oracle888730Service _service, Queue<Oracle888730Service> _services)
         {
             try
@@ -92,6 +94,7 @@ namespace Oracle888730.Classes.Handlers
             }
         }
 
+        //Invio della transazione su blockchain
         private void SendTransaction(RequestEventEventDTO _eventToHandle,Oracle888730Service _service, string _wantedValue)
         {
             try
@@ -118,6 +121,8 @@ namespace Oracle888730.Classes.Handlers
                 throw new Exception("Failed to send result on blockchain " +e.Message +" (Re-Enqueued...). From: " + _eventToHandle.Sender + " Service: " + _eventToHandle.RequestService + " ServiceType: " + _eventToHandle.RequestServiceType + " Thread: " + Thread.CurrentThread.ManagedThreadId);
             }
         }
+
+        //Controllo della presenza del servizio richiesto nel sistema
         private void CheckApiDictionary(RequestEventEventDTO _eventToHandle)
         {
             if (!CheckDictionaryContainsKey(_eventToHandle.RequestService))
@@ -138,6 +143,7 @@ namespace Oracle888730.Classes.Handlers
             }
         }
 
+        //Ottiene il valore richiesto dall'Api
         private string GetValueFromApi(RequestEventEventDTO _eventToHandle)
         {
             GenericAPIHelper genericAPIHelper;
@@ -163,6 +169,7 @@ namespace Oracle888730.Classes.Handlers
             }
             return genericAPIHelper.GetWantedValue(serviceTypeString);
         }
+
 
         private void AddElementToDictionary(string _serviceName, Type _type)
         {
