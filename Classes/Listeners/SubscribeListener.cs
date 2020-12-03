@@ -51,29 +51,36 @@ namespace Oracle888730.Classes.Listeners
             string address = _request.Event.Sender;
             string serviceType = _request.Event.SubscribeService;
             int serviceTypeValue = (int)_request.Event.SubscribeServiceType;
-            ServiceType checkServiceType = OracleContext.GetRequestedType(
-                serviceType, 
-                serviceTypeValue
-                );
-            if (checkServiceType == null)
+            try
             {
-                StringWriter.Enqueue(message + "[ERROR] Failed subscription for non existent service: " + serviceType + " from address: " + address);
-            }
-            else
-            {
-                bool result = OracleContext.AddSubscriber(CreateSubscriber(
-                    address, 
-                    checkServiceType.ServiceTypeId
-                    )
-                );
-                if (result)
+                ServiceType checkServiceType = OracleContext.GetRequestedType(
+                    serviceType,
+                    serviceTypeValue
+                    );
+                if (checkServiceType == null)
                 {
-                    StringWriter.Enqueue(message + " Successfull subscription for service: " + serviceType + " from address: " + address);
+                    StringWriter.Enqueue(message + "[ERROR] Failed subscription for non existent service: " + serviceType + " from address: " + address);
                 }
                 else
                 {
-                    StringWriter.Enqueue(message + "[WARNING] User already subscribed for service: " + serviceType + " from address: " + address);
+                    bool result = OracleContext.AddSubscriber(CreateSubscriber(
+                        address,
+                        checkServiceType.ServiceTypeId
+                        )
+                    );
+                    if (result)
+                    {
+                        StringWriter.Enqueue(message + " Successfull subscription for service: " + serviceType + " from address: " + address);
+                    }
+                    else
+                    {
+                        StringWriter.Enqueue(message + "[WARNING] User already subscribed for service: " + serviceType + " from address: " + address);
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                StringWriter.Enqueue(message + "[ERROR]: "+e.Message+". Impossible to add user for service: " + serviceType + " from address: " + address);
             }
         }
 
