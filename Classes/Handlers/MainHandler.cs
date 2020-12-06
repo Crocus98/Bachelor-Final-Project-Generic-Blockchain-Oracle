@@ -129,6 +129,10 @@ namespace Oracle888730.Classes.Handlers
             {
                 try
                 {
+                    if(_eventToHandle.RequestService == "")
+                    {
+                        throw new Exception();
+                    }
                     Type apiHelperTypeForDictionary = ModulesHelper.GetType(_eventToHandle.RequestService, apiHelpersNamespace);
                     if (apiHelperTypeForDictionary == null)
                     {
@@ -138,6 +142,10 @@ namespace Oracle888730.Classes.Handlers
                 }
                 catch
                 {
+                    if(_eventToHandle.RequestService == "")
+                    {
+                        throw new Exception("There is no service named with empty string. Asked from: " + _eventToHandle.Sender);
+                    }
                     throw new Exception("There is no service like: " + _eventToHandle.RequestService + " Asked from: " + _eventToHandle.Sender);
                 }
             }

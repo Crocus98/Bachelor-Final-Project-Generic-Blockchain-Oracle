@@ -59,6 +59,10 @@ namespace Oracle888730.Classes.Listeners
                     );
                 if (checkServiceType == null)
                 {
+                    if (serviceType == "")
+                    {
+                        serviceType = "[empty string]";
+                    }
                     StringWriter.Enqueue(message + "[ERROR] Failed subscription for non existent service: " + serviceType + " from address: " + address);
                 }
                 else
